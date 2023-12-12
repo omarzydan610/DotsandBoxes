@@ -1,35 +1,108 @@
 #include<stdio.h>
-int main(){
-    int count1=65,count2=97;
-    int i;
-    for(int i=0;i<17;i++){
-        if(i%4==0){
-            for(int j=0;j<4;j++){
-                printf("•");
-                if(1){
-                    printf("--%c--",count1++);
-                }
-                if(j==3){
-                    printf("•");
-                }
-            }
-            printf("\n");   
+#include"ANSI-color-codes.h"
+
+char arr[1000]={0};
+int choosen(char a,int b){
+    for(int i=0;i<=b;i++){
+        if(a==arr[i]){
+            return 1;
         }
-        else{
-            if(1){
-                if(i%2==0){
-                    for(int j=0;j<5;j++){
-                        printf("%c     ",count2++);
+    }
+    return 0;
+}
+
+
+
+
+int main(){
+    int index=0;
+    char x;
+            int count1=65,count2=92;
+        arr[index]=x;
+        for(int i=0;i<17;i++){
+            if(i%4==0){
+                for(int j=0;j<4;j++){
+                    printf("•");
+                    if(!choosen(count1,index)){
+                        printf("--%c--",count1);
                     }
+                    else{
+                        printf(BRED"-----"reset);
+                    }
+                    if(j==3){
+                        printf("•");
+                    }
+                    count1++;
                 }
-                else{
-                    for(int j=0;j<5;j++){
+                printf("\n"); 
+                count2+=5;
+            }
+
+            else{
+                for(int j=0;j<5;j++){
+                    if((choosen(count2,index))){
+                        printf(BBLU"|     "reset);
+                    }
+                    else{
+                        if(i%2!=0){
                         printf("|     ");
+                        }
+                        else{
+                            printf("%c     ",count2);
+                        }
                     }
+                    count2++;
                 }
+                count2-=5;
                 printf("\n");
             }
         }
+        printf("\n");
+    while(1){
+        int count1=65,count2=92;
+        printf("Enter the letter of the line : \n");
+        scanf("%c",&x);
+        arr[index]=x;
+        for(int i=0;i<17;i++){
+            if(i%4==0){
+                for(int j=0;j<4;j++){
+                    printf("•");
+                    if(!choosen(count1,index)){
+                        printf("--%c--",count1);
+                    }
+                    else{
+                        printf(BRED"-----"reset);
+                    }
+                    if(j==3){
+                        printf("•");
+                    }
+                    count1++;
+                }
+                printf("\n"); 
+                count2+=5;
+            }
+
+            else{
+                for(int j=0;j<5;j++){
+                    if((choosen(count2,index))){
+                        printf(BBLU"|     "reset);
+                    }
+                    else{
+                        if(i%2!=0){
+                        printf("|     ");
+                        }
+                        else{
+                            printf("%c     ",count2);
+                        }
+                    }
+                    count2++;
+                }
+                count2-=5;
+                printf("\n");
+            }
+        }
+        index++;
+        printf("\n");
     }
 }
 
@@ -52,3 +125,37 @@ int main(){
 //    q     r     s     t     u
 //    |     |     |     |     |
 //    •--R--•--S--•--T--•--U--•
+
+
+
+        //   for(int j=0;j<5;j++){
+        //             if(1){
+        //                 if(i%2==0){
+        //                     printf("%c     ",count2);
+        //                     count2++;   
+        //                 }
+        //                 else{
+        //                     printf("|     ");
+        //                 }
+        //             }
+        //             else{
+        //                 printf(BBLU"|     " reset);
+        //                 if(i%2==0){
+        //                     count2++;
+        //                 }
+        //             }
+        //         }
+        //         printf("\n");
+
+
+
+
+
+
+        // 
+            //     printf("|     |     |     |     |\n%c     %c     %c     %c     %c\n|     |     |     |     |\n",count2,count2+1,count2+2,count2+3,count2+4);
+            //     count2+=5;
+            // }
+
+
+
