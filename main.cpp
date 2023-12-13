@@ -43,7 +43,6 @@ void enterPlayers(){
             printf("Invalid Choice\n");
         }
     }
-
     printf("Enter player2 name : ");
     cin>>p2.playername;
     cout<<"Hi "<<p2.playername<<" " ;
@@ -248,7 +247,6 @@ int main(){
     int index=0,turn=0;
     char x=0;
     int size=chooseLevel();
-    
     enterPlayers();
     print(index,x,size,turn);
     while(index!=(size*(size+1))*2){
