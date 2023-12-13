@@ -248,7 +248,6 @@ int main(){
     int index=0,turn=0;
     char x=0;
     int size=chooseLevel();
-    
     enterPlayers();
     print(index,x,size,turn);
     while(index!=(size*(size+1))*2){
