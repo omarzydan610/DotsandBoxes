@@ -4,6 +4,7 @@
 using namespace std;
 
 char arr[60]={0};
+char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
 
 typedef struct{
     string playername;
@@ -36,7 +37,7 @@ void enterPlayers(){
         printf("Choose your color\n");
         printf("1-Red\n2-Blue\n3-Pink\n4-Yellow\n");
         cin>>p1.color;
-        if(p1.color>0&&p1.color<5){
+        if(p1.color>0 && p1.color<5){
             ans=1;
         }
         else{
@@ -126,6 +127,36 @@ void p2turn(char x){
     }
 }
 
+void p1TurnWithLetter(char x,int q){
+    if(p1.color==1){
+        printf(BRED "|  " reset"%c  ",boxes[q]);
+    }
+    else if(p1.color==2){
+        printf(BBLU "|  " reset"%c  ",boxes[q]);
+    }
+    else if(p1.color==3){
+        printf(BMAG "|  " reset"%c  ",boxes[q]);
+    }
+    else if(p1.color==4){
+        printf(BYEL "|  " reset"%c  ",boxes[q]);
+    }
+}
+
+void p2TurnWithLetter(char x,int q){
+    if(p2.color==1){
+        printf(BRED "|  " reset"%c  ",boxes[q]);
+    }
+    else if(p2.color==2){
+        printf(BBLU "|  " reset"%c  ",boxes[q]);
+    }
+    else if(p2.color==3){
+        printf(BMAG "|  " reset"%c  ",boxes[q]);
+    }
+    else if(p2.color==4){
+        printf(BYEL "|  " reset"%c  ",boxes[q]);
+    }
+}
+
 void printPlayer(int x){
     if(x%2==0 && p1.color==1){
         cout<<BRED<<p1.playername<<reset;
@@ -153,8 +184,33 @@ void printPlayer(int x){
     }
 }
 
+void isBox(char c,int size,int turn){
+    int count=0;
+    int i=c-97;
+    int def=32+((c%97)/size);
+    if(c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
+        for(int j=0;j<60;j++){
+            if(arr[j]==c){
+                count++;
+            }
+            if(arr[j]==c+1){
+                count++;
+            }
+            if(arr[j]==c-def){
+                count++;
+            }
+            if(arr[j]==c-def+size){
+                count++;
+            }
+        }
+    }
+    if(count==4){
+        boxes[i]='1';
+    }
+}
+
 void print(int index,char x,int size,int turn){
-        int count1=65,count2=96-size;
+        int count1=65,count2=96-size,q;
         arr[index]=x;
         for(int i=0;i<(4*size)+1;i++){
             if(i%4==0){
@@ -184,15 +240,32 @@ void print(int index,char x,int size,int turn){
             }
             else{
                 for(int j=0;j<size+1;j++){
+                    isBox(count2,size,turn);
+                    q=(i/4)*(size+1)+j;
                     if(choosen(count2,index) && count2!=x){
-                        printf(BGRN "|     " reset);
+                        if(i%2!=0){
+                            printf(BGRN "|     " reset);
+                        }
+                        else{
+                            printf(BGRN "|  " reset"%c  ",boxes[q]);
+                        }
                     }
                     else if(choosen(count2,index) && count2==x){
                         if(turn%2==0){
-                            p1turn('V');
+                            if(i%2!=0){
+                                p1turn('V');
+                            }
+                            else{
+                                p1TurnWithLetter('V',q);
+                            }
                         }
                         else{
-                            p2turn('V');
+                            if(i%2!=0){
+                                p2turn('V');
+                            }
+                            else{
+                                p2TurnWithLetter('V',q);
+                            }
                         }
                     }
                     else{
@@ -200,7 +273,7 @@ void print(int index,char x,int size,int turn){
                         printf("|     ");
                         }
                         else{
-                            printf("%c     ",count2);
+                            printf("%c  %c  ",count2,boxes[q]);
                         }
                     }
                     count2++;
@@ -252,8 +325,9 @@ int main(){
     while(index!=(size*(size+1))*2){
         printf("It's ");
         printPlayer(turn);
-        printf(" turn\nEnter the letter of the line uou want to choose : \n");
-        cin>>x;
+        printf(" turn\nEnter the letter of the line you want to choose : \n");
+        getchar();
+        scanf("%c",&x);
         if(!valid(x,size) || repeated(x,index)){
             continue;
         }
