@@ -43,7 +43,6 @@ void enterPlayers(){
             printf("Invalid Choice\n");
         }
     }
-
     printf("Enter player2 name : ");
     cin>>p2.playername;
     cout<<"Hi "<<p2.playername<<" " ;
