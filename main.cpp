@@ -5,12 +5,13 @@ using namespace std;
 
 char arr[60]={0};
 char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-
+char boxes2[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
 typedef struct{
     string playername;
     int color;
 }player;
 player p1,p2;
+int NoMoves1=0,NoMoves2=0;
 
 int chooseLevel(){
     int ans;
@@ -158,6 +159,13 @@ void p2TurnWithLetter(char x,int q){
 }
 
 void printPlayer(int x){
+    if(x%2==0){
+        NoMoves1++;
+    }
+    else{
+        NoMoves2++;
+    }
+
     if(x%2==0 && p1.color==1){
         cout<<BRED<<p1.playername<<reset;
     }
@@ -229,7 +237,7 @@ void print(int index,char x,int size,int turn){
     for(int i=0;i<(4*size)+1;i++){
         if(i%4==0){
             for(int j=0;j<size;j++){
-                printf("•");
+                printf("*");
                 if(choosen(count1,index) && count1!=x){
                     printf(BGRN "-----" reset);
                 }
@@ -245,7 +253,7 @@ void print(int index,char x,int size,int turn){
                     printf("--%c--",count1);
                 }
                 if(j==size-1){
-                    printf("•");
+                    printf("*");
                 }
                 count1++;
             }
@@ -423,6 +431,127 @@ void finalPrint(int size){
     printf("\n");
 }
 
+bool filled(){
+    for(int i=0;i<30;i++){
+        if(boxes[i]!=boxes2[i]){
+            for(int j=0;j<30;j++){
+                boxes2[j]=boxes[j];
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int score1(){
+    int counter1=0;
+    for(int i=0;i<30;i++){
+        if(boxes[i]=='1'){
+            counter1++;
+        }
+    }
+    return counter1;
+}
+
+int score2(){
+    int counter2=0;
+    for(int i=0;i<30;i++){
+        if(boxes[i]=='2'){
+            counter2++;
+        }
+    }
+    return counter2;
+}
+
+void printscores(){
+    printf("Current Score:\n     ");
+    if(p1.color==1){
+        printf(BRED "%i  " reset,score1());
+    }
+    else if(p1.color==2){
+        printf(BBLU"%i  " reset,score1());
+    }
+    else if(p1.color==3){
+        printf(BMAG"%i  " reset,score1());
+    }
+    else if(p1.color==4){
+        printf(BYEL"%i  " reset,score1());
+    }
+    if(p2.color==1){
+        printf(BRED"%i\n\n" reset,score2());
+    }
+    else if(p2.color==2){
+        printf(BBLU"%i\n\n" reset,score2());
+    }
+    else if(p2.color==3){
+        printf(BMAG"%i\n\n" reset,score2());
+    }
+    else if(p2.color==4){
+        printf(BYEL"%i\n\n" reset,score2());
+    }
+}
+
+void printwinner(){
+    if(score1()>score2()){
+        if(p1.color==1){
+            cout<<BRED<<p1.playername<<reset<<" WON\n";
+        }
+        else if(p1.color==2){
+            cout<<BBLU<<p1.playername<<reset<<" WON\n";
+        }
+        else if(p1.color==3){
+            cout<<BMAG<<p1.playername<<reset<<" WON\n";
+        }
+        else if(p1.color==4){
+            cout<<BYEL<<p1.playername<<reset<<" WON\n";
+        }
+    }
+    else if(score1()<score2()){
+        if(p2.color==1){
+            cout<<BRED<<p2.playername<<reset<<" WON\n";
+        }
+        else if(p2.color==2){
+            cout<<BBLU<<p2.playername<<reset<<" WON\n";
+        }
+        else if(p2.color==3){
+            cout<<BMAG<<p2.playername<<reset<<" WON\n";
+        }
+        else if(p2.color==4){
+            cout<<BYEL<<p2.playername<<reset<<" WON\n";
+        }
+    }
+    else{
+        printf("DRAW\n") ;
+    }
+}
+
+void printmoves(){
+    if(p1.color==1){
+    cout<<BRED<<p1.playername<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==2){
+    cout<<BBLU<<p1.playername<<reset<<" Moved "<<BBLU<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==3){
+    cout<<BMAG<<p1.playername<<reset<<" Moved "<<BMAG<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==4){
+    cout<<BYEL<<p1.playername<<reset<<" Moved "<<BYEL<<NoMoves1<<reset<<" moves.\n";
+    }
+    if(p2.color==1){
+    cout<<BRED<<p2.playername<<reset<<" Moved "<<BRED<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==2){
+    cout<<BBLU<<p2.playername<<reset<<" Moved "<<BBLU<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==3){
+    cout<<BMAG<<p2.playername<<reset<<" Moved "<<BMAG<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==4){
+    cout<<BYEL<<p2.playername<<reset<<" Moved "<<BYEL<<NoMoves2<<reset<<" moves.\n\n";
+    }
+}
+
 int main(){
     int index=0,turn=0;
     char x=0;
@@ -430,6 +559,8 @@ int main(){
     enterPlayers();
     print(index,x,size,turn);
     while(index!=(size*(size+1))*2){
+        printscores();
+        printmoves();
         printf("It's ");
         printPlayer(turn);
         printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -440,7 +571,12 @@ int main(){
         }
         print(index,x,size,turn);
         index++;
-        turn++;
+        if(!filled()){
+            turn++;
+        }
     }
     finalPrint(size);
+    printscores();
+    printwinner();
+    printmoves();
 }
