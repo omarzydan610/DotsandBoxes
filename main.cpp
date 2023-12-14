@@ -129,31 +129,31 @@ void p2turn(char x){
 
 void p1TurnWithLetter(char x,int q){
     if(p1.color==1){
-        printf(BRED "|  " reset"%c  ",boxes[q]);
+        printf(BRED "|  %c  " reset,boxes[q]);
     }
     else if(p1.color==2){
-        printf(BBLU "|  " reset"%c  ",boxes[q]);
+        printf(BBLU "|  %c  " reset ,boxes[q]);
     }
     else if(p1.color==3){
-        printf(BMAG "|  " reset"%c  ",boxes[q]);
+        printf(BMAG "|  %c  " reset ,boxes[q]);
     }
     else if(p1.color==4){
-        printf(BYEL "|  " reset"%c  ",boxes[q]);
+        printf(BYEL "|  %c  " reset ,boxes[q]);
     }
 }
 
 void p2TurnWithLetter(char x,int q){
     if(p2.color==1){
-        printf(BRED "|  " reset"%c  ",boxes[q]);
+        printf(BRED "|  %c  " reset,boxes[q]);
     }
     else if(p2.color==2){
-        printf(BBLU "|  " reset"%c  ",boxes[q]);
+        printf(BBLU "|  %c  " reset,boxes[q]);
     }
     else if(p2.color==3){
-        printf(BMAG "|  " reset"%c  ",boxes[q]);
+        printf(BMAG "|  %c  " reset,boxes[q]);
     }
     else if(p2.color==4){
-        printf(BYEL "|  " reset"%c  ",boxes[q]);
+        printf(BYEL "|  %c  " reset,boxes[q]);
     }
 }
 
@@ -184,11 +184,11 @@ void printPlayer(int x){
     }
 }
 
-void isBox(char c,int size,int turn){
+void isBox1(char c,int size,int turn){
     int count=0;
     int i=c-97;
-    int def=32+((c%97)/size);
-    if(c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
+    int def=32+((c%97)/(size+1));
+    if(c>=97 && c<=126 && c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
         for(int j=0;j<60;j++){
             if(arr[j]==c){
                 count++;
@@ -205,84 +205,132 @@ void isBox(char c,int size,int turn){
         }
     }
     if(count==4){
+        if(turn%2==0){
         boxes[i]='1';
+        }
+        else{
+            boxes[i]='2';
+        }
     }
 }
 
+void isBox2(char c,int size,int turn){
+    char a,b;
+    a=32+((c%65)/size);
+    isBox1(c+a,size,turn);
+    b=(32-size)+((c%(65+size))/size);
+    isBox1(c+b,size,turn);
+    
+}
+
 void print(int index,char x,int size,int turn){
-        int count1=65,count2=96-size,q;
-        arr[index]=x;
-        for(int i=0;i<(4*size)+1;i++){
-            if(i%4==0){
-                for(int j=0;j<size;j++){
-                    printf("•");
-                    if(choosen(count1,index) && count1!=x){
-                        printf(BGRN "-----" reset);
-                    }
-                    else if(choosen(count1,index) && count1==x){
-                        if(turn%2==0){
-                            p1turn('H');
-                        }
-                        else{
-                            p2turn('H');
-                        }
+    int count1=65,count2=96-size,q;
+    arr[index]=x;
+    for(int i=0;i<(4*size)+1;i++){
+        if(i%4==0){
+            for(int j=0;j<size;j++){
+                printf("•");
+                if(choosen(count1,index) && count1!=x){
+                    printf(BGRN "-----" reset);
+                }
+                else if(choosen(count1,index) && count1==x){
+                    if(turn%2==0){
+                        p1turn('H');
                     }
                     else{
-                        printf("--%c--",count1);
+                        p2turn('H');
                     }
-                    if(j==size-1){
-                        printf("•");
-                    }
-                    count1++;
                 }
-                printf("\n"); 
-                count2+=size+1;
+                else{
+                    printf("--%c--",count1);
+                }
+                if(j==size-1){
+                    printf("•");
+                }
+                count1++;
             }
-            else{
-                for(int j=0;j<size+1;j++){
-                    isBox(count2,size,turn);
-                    q=(i/4)*(size+1)+j;
-                    if(choosen(count2,index) && count2!=x){
-                        if(i%2!=0){
-                            printf(BGRN "|     " reset);
-                        }
-                        else{
+            printf("\n"); 
+            count2+=size+1;
+        }
+        else{
+            for(int j=0;j<size+1;j++){
+                if(x>=97 && x<=126){
+                    isBox1(x,size,turn);
+                    if(x!='a'){
+                    isBox1(x-1,size,turn);
+                    }
+                }
+                else{
+                    isBox2(x,size,turn);
+                }
+                q=(i/4)*(size+1)+j;
+                if(choosen(count2,index) && count2!=x){
+                    if(i%2!=0){
+                        printf(BGRN "|     " reset);
+                    }
+                    else{
+                        if(boxes[q]==' '){
                             printf(BGRN "|  " reset"%c  ",boxes[q]);
                         }
+                        else if(boxes[q]=='1' && p1.color==1){
+                            printf(BGRN "|  " reset BRED"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='1' && p1.color==2){
+                            printf(BGRN "|  " reset BBLU"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='1' && p1.color==3){
+                            printf(BGRN "|  " reset BMAG"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='1' && p1.color==1){
+                            printf(BGRN "|  " reset BYEL"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='2' && p2.color==1){
+                            printf(BGRN "|  " reset BRED"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='2' && p2.color==2){
+                            printf(BGRN "|  " reset BBLU"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='2' && p2.color==3){
+                            printf(BGRN "|  " reset BMAG"%c  " reset,boxes[q]);
+                        }
+                        else if(boxes[q]=='2' && p2.color==4){
+                            printf(BGRN "|  " reset BYEL"%c  " reset,boxes[q]);
+                        }
                     }
-                    else if(choosen(count2,index) && count2==x){
-                        if(turn%2==0){
-                            if(i%2!=0){
-                                p1turn('V');
-                            }
-                            else{
-                                p1TurnWithLetter('V',q);
-                            }
+                }
+                else if(choosen(count2,index) && count2==x){
+                    if(turn%2==0){
+                        if(i%2!=0){
+                            p1turn('V');
                         }
                         else{
-                            if(i%2!=0){
-                                p2turn('V');
-                            }
-                            else{
-                                p2TurnWithLetter('V',q);
-                            }
+                            p1TurnWithLetter('V',q);
                         }
                     }
                     else{
                         if(i%2!=0){
-                        printf("|     ");
+                            p2turn('V');
                         }
                         else{
-                            printf("%c  %c  ",count2,boxes[q]);
+                            p2TurnWithLetter('V',q);
                         }
                     }
-                    count2++;
                 }
-                count2-=size+1;
-                printf("\n");
+                else{
+                    if(i%2!=0){
+                    printf("|     ");
+                    }
+                    else{
+                        printf("%c  %c  ",count2,boxes[q]);
+                    }
+                }
+                count2++;
             }
+            count2-=size+1;
+            printf("\n");
         }
-        printf("\n");
+    }
+    printf("\n");
 }
 
 bool valid(char x,int size){
@@ -316,6 +364,65 @@ bool repeated(char x,int b){
     return 0;
 }
 
+void finalPrint(int size){
+    int count1=65,count2=96-size,q;
+    for(int i=0;i<(4*size)+1;i++){
+        if(i%4==0){
+            for(int j=0;j<size;j++){
+                printf("•");
+                printf(BGRN "-----" reset);
+                if(j==size-1){
+                    printf("•");
+                }
+                count1++;
+            }
+            printf("\n"); 
+            count2+=size+1;
+        }
+        else{
+            for(int j=0;j<size+1;j++){
+                q=(i/4)*(size+1)+j;
+                if(i%2==0){
+                    if(boxes[q]==' '){
+                        printf(BGRN "|  " reset"%c  ",boxes[q]);
+                    }
+                    else if(boxes[q]=='1' && p1.color==1){
+                        printf(BGRN "|  " reset BRED"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='1' && p1.color==2){
+                        printf(BGRN "|  " reset BBLU"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='1' && p1.color==3){
+                        printf(BGRN "|  " reset BMAG"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='1' && p1.color==1){
+                        printf(BGRN "|  " reset BYEL"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='2' && p2.color==1){
+                        printf(BGRN "|  " reset BRED"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='2' && p2.color==2){
+                        printf(BGRN "|  " reset BBLU"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='2' && p2.color==3){
+                        printf(BGRN "|  " reset BMAG"%c  " reset,boxes[q]);
+                    }
+                    else if(boxes[q]=='2' && p2.color==4){
+                        printf(BGRN "|  " reset BYEL"%c  " reset,boxes[q]);
+                    }
+                }
+                else{
+                    printf(BGRN "|     " reset);
+                }
+                count2++;
+            }
+            count2-=size+1;
+            printf("\n");
+        }
+    }
+    printf("\n");
+}
+
 int main(){
     int index=0,turn=0;
     char x=0;
@@ -335,4 +442,5 @@ int main(){
         index++;
         turn++;
     }
+    finalPrint(size);
 }
