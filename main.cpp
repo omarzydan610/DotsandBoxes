@@ -577,6 +577,6 @@ int main(){
     }
     finalPrint(size);
     printscores();
-    printwinner();
     printmoves();
+    printwinner();
 }
