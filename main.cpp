@@ -11,6 +11,7 @@ typedef struct{
     int color;
 }player;
 player p1,p2;
+
 int NoMoves1=0,NoMoves2=0;
 
 int chooseLevel(){
@@ -575,6 +576,7 @@ int main(){
             turn++;
         }
     }
+
     finalPrint(size);
     printscores();
     printmoves();
