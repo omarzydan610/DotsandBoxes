@@ -11,6 +11,7 @@ typedef struct{
     int color;
 }player;
 player p1,p2;
+int NoMoves1=0,NoMoves2=0;
 
 int chooseLevel(){
     int ans;
@@ -158,6 +159,13 @@ void p2TurnWithLetter(char x,int q){
 }
 
 void printPlayer(int x){
+    if(x%2==0){
+        NoMoves1++;
+    }
+    else{
+        NoMoves2++;
+    }
+
     if(x%2==0 && p1.color==1){
         cout<<BRED<<p1.playername<<reset;
     }
@@ -517,6 +525,33 @@ void printwinner(){
     }
 }
 
+void printmoves(){
+    if(p1.color==1){
+    cout<<BRED<<p1.playername<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==2){
+    cout<<BBLU<<p1.playername<<reset<<" Moved "<<BBLU<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==3){
+    cout<<BMAG<<p1.playername<<reset<<" Moved "<<BMAG<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==4){
+    cout<<BYEL<<p1.playername<<reset<<" Moved "<<BYEL<<NoMoves1<<reset<<" moves.\n";
+    }
+    if(p2.color==1){
+    cout<<BRED<<p2.playername<<reset<<" Moved "<<BRED<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==2){
+    cout<<BBLU<<p2.playername<<reset<<" Moved "<<BBLU<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==3){
+    cout<<BMAG<<p2.playername<<reset<<" Moved "<<BMAG<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==4){
+    cout<<BYEL<<p2.playername<<reset<<" Moved "<<BYEL<<NoMoves2<<reset<<" moves.\n\n";
+    }
+}
+
 int main(){
     int index=0,turn=0;
     char x=0;
@@ -525,6 +560,7 @@ int main(){
     print(index,x,size,turn);
     while(index!=(size*(size+1))*2){
         printscores();
+        printmoves();
         printf("It's ");
         printPlayer(turn);
         printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -534,12 +570,13 @@ int main(){
             continue;
         }
         print(index,x,size,turn);
-        index++;
+        index++; 
         if(!filled()){
             turn++;
         }
     }
     finalPrint(size);
     printscores();
+    printmoves();
     printwinner();
 }
