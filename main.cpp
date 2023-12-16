@@ -1,17 +1,19 @@
 #include<stdio.h>
 #include<iostream>
+#include<time.h>
 #include"ANSI-color-codes.h"
 using namespace std;
 
+int NoMoves1=0,NoMoves2=0;
 char arr[60]={0};
 char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
 char boxes2[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
 typedef struct{
     string playername;
     int color;
+    int score;
 }player;
 player p1,p2;
-int NoMoves1=0,NoMoves2=0;
 
 int chooseLevel(){
     int ans;
@@ -29,7 +31,20 @@ int chooseLevel(){
     }
 }
 
-void enterPlayers(){
+int choosemode(){
+    int ans;
+    printf("Choose Mode\n1-1 VS 1\n2-Player VS Computer\n");
+    cin>>ans;
+    if(ans==1 || ans==2){
+        return ans;
+    }
+    else{
+        printf("Invalid Choice\n");
+        return choosemode();
+    }
+}
+
+void enterplayers1(){
     printf("Enter player1 name : ");
     cin>>p1.playername;
     cout<<"Hi "<<p1.playername<<" ";
@@ -159,13 +174,6 @@ void p2TurnWithLetter(char x,int q){
 }
 
 void printPlayer(int x){
-    if(x%2==0){
-        NoMoves1++;
-    }
-    else{
-        NoMoves2++;
-    }
-
     if(x%2==0 && p1.color==1){
         cout<<BRED<<p1.playername<<reset;
     }
@@ -494,30 +502,30 @@ void printscores(){
 void printwinner(){
     if(score1()>score2()){
         if(p1.color==1){
-            cout<<BRED<<p1.playername<<reset<<" WON\n";
+            cout<<BRED<<p1.playername<<reset<<" WON\n\n";
         }
         else if(p1.color==2){
-            cout<<BBLU<<p1.playername<<reset<<" WON\n";
+            cout<<BBLU<<p1.playername<<reset<<" WON\n\n";
         }
         else if(p1.color==3){
-            cout<<BMAG<<p1.playername<<reset<<" WON\n";
+            cout<<BMAG<<p1.playername<<reset<<" WON\n\n";
         }
         else if(p1.color==4){
-            cout<<BYEL<<p1.playername<<reset<<" WON\n";
+            cout<<BYEL<<p1.playername<<reset<<" WON\n\n";
         }
     }
     else if(score1()<score2()){
         if(p2.color==1){
-            cout<<BRED<<p2.playername<<reset<<" WON\n";
+            cout<<BRED<<p2.playername<<reset<<" WON\n\n";
         }
         else if(p2.color==2){
-            cout<<BBLU<<p2.playername<<reset<<" WON\n";
+            cout<<BBLU<<p2.playername<<reset<<" WON\n\n";
         }
         else if(p2.color==3){
-            cout<<BMAG<<p2.playername<<reset<<" WON\n";
+            cout<<BMAG<<p2.playername<<reset<<" WON\n\n";
         }
         else if(p2.color==4){
-            cout<<BYEL<<p2.playername<<reset<<" WON\n";
+            cout<<BYEL<<p2.playername<<reset<<" WON\n\n";
         }
     }
     else{
@@ -552,31 +560,89 @@ void printmoves(){
     }
 }
 
-int main(){
-    int index=0,turn=0;
+void printremaininglines(int size,int b){
+    int total=(size*(size+1))*2;
+    int counter=0;
+    for(int i=0;i<b;i++){
+        if(arr[i]!=0){
+            counter++;
+        }
+    }
+    cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
+}
+
+void printtime(struct timespec begin,struct timespec end){
+    int sec=end.tv_sec-begin.tv_sec;
+    int min=0;
+    if(sec>59){
+        min=sec/60;
+        sec%=60;
+    }
+    cout<<"Time spent : ";
+    cout<<BGRN<<min;
+    if(sec<10){
+        cout<<" : 0"<<sec<<reset<<"\n\n";
+    }
+    else{
+        cout<<" : "<<sec<<reset<<"\n\n";
+    }
+
+}
+
+void mode1(int index,int size,struct timespec begin){
+    struct timespec end;
+    int turn=0;
     char x=0;
-    int size=chooseLevel();
-    enterPlayers();
+    enterplayers1();
     print(index,x,size,turn);
     while(index!=(size*(size+1))*2){
+        timespec_get(&end,TIME_UTC);
         printscores();
         printmoves();
+        printremaininglines(size,index);
+        printtime(begin,end);
         printf("It's ");
         printPlayer(turn);
         printf(" turn\nEnter the letter of the line you want to choose : \n");
-        getchar();
-        scanf("%c",&x);
+        cin>>x;
         if(!valid(x,size) || repeated(x,index)){
             continue;
         }
+        if(turn%2==0 ){
+            NoMoves1++;
+        }
+        else{
+            NoMoves2++;
+        }
         print(index,x,size,turn);
-        index++;
+        index++; 
         if(!filled()){
             turn++;
         }
     }
+}
+
+void mode2(int index,int size,struct timespec begin){
+
+}
+
+int main(){
+    struct timespec begin,end2;
+    timespec_get(&begin,TIME_UTC);
+    int index=0;
+    int size=chooseLevel();
+    int mode=choosemode();
+    if(mode==1){
+        mode1(index,size,begin);
+    }
+    else{
+        mode2(index,size,begin);
+    }
+    timespec_get (&end2,TIME_UTC);
     finalPrint(size);
     printscores();
     printmoves();
+    printremaininglines(size,(size*(size+1)*2));
+    printtime(begin,end2);
     printwinner();
 }
