@@ -3,7 +3,7 @@
 #include<time.h>
 #include"ANSI-color-codes.h"
 using namespace std;
-
+ 
 int NoMoves1=0,NoMoves2=0;
 char arr[60]={0};
 char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
