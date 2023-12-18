@@ -4,7 +4,7 @@
 #include"ANSI-color-codes.h"
 using namespace std;
 
-int NoMoves1=0,NoMoves2=0;
+int NoMoves1=0,NoMoves2=0,upper,lower;
 char usedChars[60]={0};
 char turns[60]={0};
 char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
@@ -156,15 +156,74 @@ void isBox2(char c,int size,int turn){
     
 }
 
-void print(int index,char x,int size,int turn){
-    int count1=65,count2=96-size,q;
-    usedChars[index]=x;
-    turns[index]=(turn%2)+1;
-    for(int i=0;i<(4*size)+1;i++){
-        if(i%4==0){
-            for(int j=0;j<size;j++){
+bool valid(char x,int size){
+    if(size==5){
+        if((x>=65&&x<=94)||(x>=97&&x<=126)){
+            return 1;
+        }
+        else{
+            printf("Invalid Character\n");
+            return 0;
+        }
+    }
+    else{
+        if((x>=65&&x<=70)||(x>=97&&x<=102)){
+            return 1;
+        }
+        else{
+            printf("Invalid Character\n");
+            return 0;
+        }
+    }
+}
+
+bool repeated(char x,int b){
+    for(int i=0;i<b;i++){
+        if(usedChars[i]==x){
+            printf("Already taken\n");
+            return 1;
+        }
+    }
+    return 0;
+}
+
+bool filled(){
+    for(int i=0;i<30;i++){
+        if(boxes[i]!=boxes2[i]){
+            for(int j=0;j<30;j++){
+                boxes2[j]=boxes[j];
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int score1(){
+    int counter1=0;
+    for(int i=0;i<30;i++){
+        if(boxes[i]=='1'){
+            counter1++;
+        }
+    }
+    return counter1;
+}
+
+int score2(){
+    int counter2=0;
+    for(int i=0;i<30;i++){
+        if(boxes[i]=='2'){
+            counter2++;
+        }
+    }
+    return counter2;
+}
+
+
+void printHorizontel(int index,char x,int size,int turn){
+    for(int j=0;j<size;j++){
                 printf("*");
-                if(choosen(count1,index)==1){
+                if(choosen(upper,index)==1){
                     if(p1.color==1){
                         printf(BRED "-----" reset);
                     }
@@ -178,7 +237,7 @@ void print(int index,char x,int size,int turn){
                         printf(BYEL "-----" reset);
                     }
                 }
-                else if(choosen(count1,index)==2){
+                else if(choosen(upper,index)==2){
                     if(p2.color==1){
                         printf(BRED "-----" reset);
                     }
@@ -193,29 +252,17 @@ void print(int index,char x,int size,int turn){
                     }
                 }
                 else{
-                    printf("--%c--",count1);
+                    printf("--%c--",upper);
                 }
                 if(j==size-1){
                     printf("*");
                 }
-                count1++;
+                upper++;
             }
-            printf("\n"); 
-            count2+=size+1;
-        }
-        else{
-            for(int j=0;j<size+1;j++){
-                if(x>=97 && x<=126){
-                    isBox1(x,size,turn);
-                    if(x!='a'){
-                    isBox1(x-1,size,turn);
-                    }
-                }
-                else{
-                    isBox2(x,size,turn);
-                }
-                q=(i/4)*(size+1)+j;
-                if(choosen(count2,index)==1){
+}
+
+void printCharInBox(int index,int i,int q){
+    if(choosen(lower,index)==1){
                     if(i%2!=0){
                         if(p1.color==1){
                             printf(BRED "|     " reset);
@@ -315,7 +362,7 @@ void print(int index,char x,int size,int turn){
                         }
                     }
                 }
-                else if(choosen(count2,index)==2){
+                else if(choosen(lower,index)==2){
                     if(i%2!=0){
                         if(p2.color==1){
                             printf(BRED "|     " reset);
@@ -415,85 +462,55 @@ void print(int index,char x,int size,int turn){
                         }
                     }
                 }
+}
+
+void printVertical(int index,char x,int size,int turn,int i){
+    int q;
+    for(int j=0;j<size+1;j++){
+                if(x>=97 && x<=126){
+                    isBox1(x,size,turn);
+                    if(x!='a'){
+                    isBox1(x-1,size,turn);
+                    }
+                }
+                else{
+                    isBox2(x,size,turn);
+                }
+                q=(i/4)*(size+1)+j;
+                if(choosen(lower,index)!=0){
+                    printCharInBox(index,i,q);
+                } 
                 else{
                     if(i%2!=0){
                     printf("|     ");
                     }
                     else{
-                        printf("%c  %c  ",count2,boxes[q]);
+                        printf("%c  %c  ",lower,boxes[q]);
                     }
                 }
-                count2++;
+                lower++;
             }
-            count2-=size+1;
+}
+
+void controlprint(int index,char x,int size,int turn){
+    upper=65,lower=96-size;
+    usedChars[index]=x;
+    turns[index]=(turn%2)+1;
+    for(int i=0;i<(4*size)+1;i++){
+        if(i%4==0){
+            printHorizontel(index,x,size,turn);
+            printf("\n"); 
+            lower+=size+1;
+        }
+        else{
+            printVertical(index,x,size,turn,i);   
+            lower-=size+1;
             printf("\n");
         }
     }
     printf("\n");
 }
 
-bool valid(char x,int size){
-    if(size==5){
-        if((x>=65&&x<=94)||(x>=97&&x<=126)){
-            return 1;
-        }
-        else{
-            printf("Invalid Character\n");
-            return 0;
-        }
-    }
-    else{
-        if((x>=65&&x<=70)||(x>=97&&x<=102)){
-            return 1;
-        }
-        else{
-            printf("Invalid Character\n");
-            return 0;
-        }
-    }
-}
-
-bool repeated(char x,int b){
-    for(int i=0;i<b;i++){
-        if(usedChars[i]==x){
-            printf("Already taken\n");
-            return 1;
-        }
-    }
-    return 0;
-}
-
-bool filled(){
-    for(int i=0;i<30;i++){
-        if(boxes[i]!=boxes2[i]){
-            for(int j=0;j<30;j++){
-                boxes2[j]=boxes[j];
-            }
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int score1(){
-    int counter1=0;
-    for(int i=0;i<30;i++){
-        if(boxes[i]=='1'){
-            counter1++;
-        }
-    }
-    return counter1;
-}
-
-int score2(){
-    int counter2=0;
-    for(int i=0;i<30;i++){
-        if(boxes[i]=='2'){
-            counter2++;
-        }
-    }
-    return counter2;
-}
 
 void printscores(){
     printf("Current Score:\n     ");
@@ -603,7 +620,7 @@ void printtime(struct timespec begin,struct timespec end){
         sec%=60;
     }
     cout<<"Time spent : ";
-    cout<<BGRN<<min;
+    cout<<BGRN<<"0"<<min;
     if(sec<10){
         cout<<" : 0"<<sec<<reset<<"\n\n";
     }
@@ -618,7 +635,7 @@ void mode1(int index,int size,struct timespec begin){
     int turn=0;
     char x=0;
     enterplayers1();
-    print(index,x,size,turn);
+    controlprint(index,x,size,turn);
     while(index!=(size*(size+1))*2){
         timespec_get(&end,TIME_UTC);
         printscores();
@@ -638,7 +655,7 @@ void mode1(int index,int size,struct timespec begin){
         else{
             NoMoves2++;
         }
-        print(index,x,size,turn);
+        controlprint(index,x,size,turn);
         index++; 
         if(!filled()){
             turn++;
