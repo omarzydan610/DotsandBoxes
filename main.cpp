@@ -81,6 +81,26 @@ void enterplayers1(){
     }
 }
 
+void enterplayers2(){
+    printf("Enter your name : ");
+    cin>>p1.playername;
+    cout<<"Hi "<<p1.playername<<" ";
+    int ans=0;
+    while(ans==0){
+        printf("Choose your color\n");
+        printf("1-Red\n2-Blue\n3-Pink\n");
+        cin>>p1.color;
+        if(p1.color>0 && p1.color<4){
+            ans=1;
+        }
+        else{
+            printf("Invalid Choice\n");
+        }
+    }
+    p2.playername="Computer";
+    p2.color=4;
+}
+
 int choosen(char a,int b){
     for(int i=0;i<=b;i++){
         if(a==usedChars[i]){
@@ -117,6 +137,7 @@ void printPlayer(int x){
     }
 }
 
+char lastline=' ';
 void isBox1(char c,int size,int turn){
     int count=0;
     int i=c-97;
@@ -126,14 +147,26 @@ void isBox1(char c,int size,int turn){
             if(usedChars[j]==c){
                 count++;
             }
+            else{
+                lastline=c;
+            }
             if(usedChars[j]==c+1){
                 count++;
+            }
+            else{
+                lastline=c+1;
             }
             if(usedChars[j]==c-def){
                 count++;
             }
+            else{
+                lastline=c-def;
+            }
             if(usedChars[j]==c-def+size){
                 count++;
+            }
+            else{
+                lastline=c-def+size;
             }
         }
     }
@@ -144,6 +177,12 @@ void isBox1(char c,int size,int turn){
         else{
             boxes[i]='2';
         }
+    }
+    if(count==3){
+        return;
+    }
+    else{
+        lastline=' ';
     }
 }
 
@@ -178,7 +217,7 @@ bool valid(char x,int size){
 }
 
 bool repeated(char x,int b){
-    for(int i=0;i<b;i++){
+    for(int i=0;i<=b;i++){
         if(usedChars[i]==x){
             printf("Already taken\n");
             return 1;
@@ -261,7 +300,7 @@ void printHorizontel(int index,char x,int size,int turn){
             }
 }
 
-void printCharInBox(int index,int i,int q){
+void printNumInBox(int index,int i,int q){
     if(choosen(lower,index)==1){
                     if(i%2!=0){
                         if(p1.color==1){
@@ -478,7 +517,7 @@ void printVertical(int index,char x,int size,int turn,int i){
                 }
                 q=(i/4)*(size+1)+j;
                 if(choosen(lower,index)!=0){
-                    printCharInBox(index,i,q);
+                    printNumInBox(index,i,q);
                 } 
                 else{
                     if(i%2!=0){
@@ -492,7 +531,7 @@ void printVertical(int index,char x,int size,int turn,int i){
             }
 }
 
-void controlprint(int index,char x,int size,int turn){
+void printGrid(int index,char x,int size,int turn){
     upper=65,lower=96-size;
     usedChars[index]=x;
     turns[index]=(turn%2)+1;
@@ -635,7 +674,7 @@ void mode1(int index,int size,struct timespec begin){
     int turn=0;
     char x=0;
     enterplayers1();
-    controlprint(index,x,size,turn);
+    printGrid(index,x,size,turn);
     while(index!=(size*(size+1))*2){
         timespec_get(&end,TIME_UTC);
         printscores();
@@ -655,7 +694,7 @@ void mode1(int index,int size,struct timespec begin){
         else{
             NoMoves2++;
         }
-        controlprint(index,x,size,turn);
+        printGrid(index,x,size,turn);
         index++; 
         if(!filled()){
             turn++;
@@ -664,7 +703,74 @@ void mode1(int index,int size,struct timespec begin){
 }
 
 void mode2(int index,int size,struct timespec begin){
-
+    struct timespec end;
+    int turn=0;
+    char x=0;
+    enterplayers2();
+    printGrid(index,x,size,turn);
+    while(index!=(size*(size+1))*2){
+        if(turn%2==0){
+            timespec_get(&end,TIME_UTC);
+            printscores();
+            printmoves();
+            printremaininglines(size,index);
+            printtime(begin,end);
+            printf("It's ");
+            printPlayer(turn);
+            printf(" turn\nEnter the letter of the line you want to choose : \n");
+            cin>>x;
+            if(!valid(x,size) || repeated(x,index)){
+                continue;
+            }
+                NoMoves1++;
+            printGrid(index,x,size,turn);
+            index++; 
+        }
+        else{
+            x='0';
+            for(int i=97;i<97+(size*(size+1));i++){
+                if(!choosen(i,index)){
+                    x=i;
+                    break;
+                }
+            }   
+            if(x=='0'){
+                for(int i=65;i<65+(size*(size+1));i++){
+                    if(!choosen(i,index)){
+                        x=i;
+                        break;
+                    }
+                }  
+            }
+            for(int i=65;i<126;i++){
+                if(i<=65&&i>=94){
+                    isBox2(i,size,turn);
+                    if(lastline!=' '){
+                        break;
+                    }
+                }
+                else if(i>=96&&i<=126){
+                    isBox1(i,size,turn);
+                    if(lastline!=' '){
+                        break;
+                    }
+                    isBox1(i-1,size,turn);
+                    if(lastline!=' '){
+                        break;
+                    }
+                }
+            }
+            if(lastline!=' '){
+                x=lastline;
+            }
+            NoMoves2++;
+            printGrid(index,x,size,turn);
+            index++; 
+        }
+        if(!filled()){
+            turn++;
+        }
+    }
 }
 
 int main(){
