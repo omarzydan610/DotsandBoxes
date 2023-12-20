@@ -137,8 +137,30 @@ void printPlayer(int x){
     }
 }
 
+
 char lastline=' ';
-void isBox1(char c,int size,int turn){
+void whoIsLast(char c,int def,int size){
+    if(choosen(c,60)){
+        if(choosen(c+1,60)){
+            if(choosen(c-def,60)){
+                lastline=c-def+size;
+            }
+            else{
+                lastline=c-def;
+            }
+        }
+        else{
+            lastline=c+1;
+        }
+    }
+    else{
+        lastline=c;
+    }
+}
+
+
+void computerLogic(char c,int size,int turn){
+    lastline=' ';
     int count=0;
     int i=c-97;
     int def=32+((c%97)/(size+1));
@@ -147,26 +169,40 @@ void isBox1(char c,int size,int turn){
             if(usedChars[j]==c){
                 count++;
             }
-            else{
-                lastline=c;
-            }
             if(usedChars[j]==c+1){
                 count++;
-            }
-            else{
-                lastline=c+1;
             }
             if(usedChars[j]==c-def){
                 count++;
             }
-            else{
-                lastline=c-def;
-            }
             if(usedChars[j]==c-def+size){
                 count++;
             }
-            else{
-                lastline=c-def+size;
+        }
+    }
+        if(count==3){
+        whoIsLast(c,def,size);
+    }
+}
+
+void isBox1(char c,int size,int turn){
+    lastline=' ';
+    int count=0;
+    int i=c-97;
+    int def=32+((c%97)/(size+1));
+    if(c>=97 && c<=126 && c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
+        for(int j=0;j<60;j++){
+            if(usedChars[j]==c){
+                count++;
+            }
+            if(usedChars[j]==c+1){
+                count++;
+            }
+            if(usedChars[j]==c-def){
+                count++;
+            }
+            if(usedChars[j]==c-def+size){
+                count++;
             }
         }
     }
@@ -177,12 +213,6 @@ void isBox1(char c,int size,int turn){
         else{
             boxes[i]='2';
         }
-    }
-    if(count==3){
-        return;
-    }
-    else{
-        lastline=' ';
     }
 }
 
@@ -742,23 +772,11 @@ void mode2(int index,int size,struct timespec begin){
                     }
                 }  
             }
-            for(int i=65;i<126;i++){
-                if(i<=65&&i>=94){
-                    isBox2(i,size,turn);
+            for(int i=97;i<97+(size*(size+1));i++){
+                    computerLogic(i,size,turn);
                     if(lastline!=' '){
                         break;
                     }
-                }
-                else if(i>=96&&i<=126){
-                    isBox1(i,size,turn);
-                    if(lastline!=' '){
-                        break;
-                    }
-                    isBox1(i-1,size,turn);
-                    if(lastline!=' '){
-                        break;
-                    }
-                }
             }
             if(lastline!=' '){
                 x=lastline;
