@@ -681,13 +681,29 @@ void printremaininglines(int size,int b){
     cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
 }
 
-void printtime(struct timespec begin,struct timespec end){
-    int sec=end.tv_sec-begin.tv_sec;
+void printtime(/*struct timespec begin*/time_t begin,/*struct timespec end*/time_t end){
+    /*===============for mac==============*/
+    // int sec=end.tv_sec-begin.tv_sec;
+    // int min=0;
+    // if(sec>59){
+    //     min=sec/60;
+    //     sec%=60;
+    // }
+    // cout<<"Time spent : ";
+    // cout<<BGRN<<"0"<<min;
+    // if(sec<10){
+    //     cout<<" : 0"<<sec<<reset<<"\n\n";
+    // }
+    // else{
+    //     cout<<" : "<<sec<<reset<<"\n\n";
+    // }
+    /*=============for windows=============*/
+    int sec=(end-begin)/CLOCKS_PER_SEC;
     int min=0;
-    if(sec>59){
+        if(sec>59){
         min=sec/60;
         sec%=60;
-    }
+        }
     cout<<"Time spent : ";
     cout<<BGRN<<"0"<<min;
     if(sec<10){
@@ -696,21 +712,22 @@ void printtime(struct timespec begin,struct timespec end){
     else{
         cout<<" : "<<sec<<reset<<"\n\n";
     }
-
 }
 
-void mode1(int index,int size,struct timespec begin){
-    struct timespec end;
+void mode1(int index,int size,time_t begin/*struct timespec begin*/){
+    // struct timespec end;
+    time_t end2;
     int turn=0;
     char x=0;
     enterplayers1();
     printGrid(index,x,size,turn);
     while(index!=(size*(size+1))*2){
-        timespec_get(&end,TIME_UTC);
+        // timespec_get(&end,TIME_UTC);
+        time_t end2=clock();
         printscores();
         printmoves();
         printremaininglines(size,index);
-        printtime(begin,end);
+        printtime(begin,end2);
         printf("It's ");
         printPlayer(turn);
         printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -732,15 +749,17 @@ void mode1(int index,int size,struct timespec begin){
     }
 }
 
-void mode2(int index,int size,struct timespec begin){
-    struct timespec end;
+void mode2(int index,int size,time_t begin/*struct timespec begin*/){
+    // struct timespec end;
+    time_t end;
     int turn=0;
     char x=0;
     enterplayers2();
     printGrid(index,x,size,turn);
     while(index!=(size*(size+1))*2){
         if(turn%2==0){
-            timespec_get(&end,TIME_UTC);
+            // timespec_get(&end,TIME_UTC);
+            time_t end=clock();
             printscores();
             printmoves();
             printremaininglines(size,index);
@@ -792,8 +811,9 @@ void mode2(int index,int size,struct timespec begin){
 }
 
 int main(){
-    struct timespec begin,end2;
-    timespec_get(&begin,TIME_UTC);
+    // struct timespec begin,end2;             /* for mac */
+    // timespec_get(&begin,TIME_UTC);
+    time_t begin=clock();                       /* for windows */
     int index=0;
     int size=chooseLevel();
     int mode=choosemode();
@@ -803,7 +823,8 @@ int main(){
     else{
         mode2(index,size,begin);
     }
-    timespec_get (&end2,TIME_UTC);
+    // timespec_get (&end2,TIME_UTC);
+    time_t end2=clock();
     printscores();
     printmoves();
     printremaininglines(size,(size*(size+1)*2));
