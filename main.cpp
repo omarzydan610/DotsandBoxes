@@ -902,7 +902,7 @@ void top10(){
 
 void menu(){
     char ans;
-    printf("Press\n1-New game\n2-load saved game\n3-Top Players\n");
+    printf("Press\n1-New game\n2-load saved game\n3-Top Players\n4-exit\n");
     cin>>ans;
     if(ans=='1'){
         newGame();
@@ -913,11 +913,14 @@ void menu(){
     else if(ans=='3'){
         top10();
     }
+    else if(ans=='4'){
+        return ;
+    }
     else{
         printf("Invalid Choice\n");
         menu();
     }
-
+    menu();
 }
 
 int main(){
