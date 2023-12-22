@@ -2,6 +2,7 @@
 #include<iostream>
 #include<time.h>
 #include"ANSI-color-codes.h"
+#include<vector>
 using namespace std;
 
 int NoMoves1=0,NoMoves2=0,upper,lower;
@@ -9,6 +10,10 @@ char usedChars[60]={0};
 char turns[60]={0};
 char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
 char boxes2[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+char undoarr[25]={0};
+char redoarr[25]={0};
+int index1=0,index2=0,index3=0;
+int turn=0;
 typedef struct{
     string playername;
     int color;
@@ -101,8 +106,8 @@ void enterplayers2(){
     p2.color=4;
 }
 
-int choosen(char a,int b){
-    for(int i=0;i<=b;i++){
+int choosen(char a){
+    for(int i=0;i<=60;i++){
         if(a==usedChars[i]){
             return turns[i];
         }
@@ -110,29 +115,29 @@ int choosen(char a,int b){
     return 0;
 }
 
-void printPlayer(int x){
-    if(x%2==0 && p1.color==1){
+void printPlayer(){
+    if(turn==0 && p1.color==1){
         cout<<BRED<<p1.playername<<reset;
     }
-    else if(x%2==0 && p1.color==2){
+    else if(turn==0 && p1.color==2){
         cout<<BBLU<<p1.playername<<reset;
     }
-    else if(x%2==0 && p1.color==3){
+    else if(turn==0 && p1.color==3){
         cout<<BMAG<<p1.playername<<reset;
     }
-    else if(x%2==0 && p1.color==4){
+    else if(turn==0&& p1.color==4){
         cout<<BYEL<<p1.playername<<reset;
     }
-    else if(x%2==1 && p2.color==1){
+    else if(turn==1 && p2.color==1){
         cout<<BRED<<p2.playername<<reset;
     }
-    else if(x%2==1 && p2.color==2){
+    else if(turn==1 && p2.color==2){
         cout<<BBLU<<p2.playername<<reset;
     }
-    else if(x%2==1 && p2.color==3){
+    else if(turn==1 && p2.color==3){
         cout<<BMAG<<p2.playername<<reset;
     }
-    else if(x%2==1 && p2.color==4){
+    else if(turn==1 && p2.color==4){
         cout<<BYEL<<p2.playername<<reset;
     }
 }
@@ -140,9 +145,9 @@ void printPlayer(int x){
 
 char lastline=' ';
 void whoIsLast(char c,int def,int size){
-    if(choosen(c,60)){
-        if(choosen(c+1,60)){
-            if(choosen(c-def,60)){
+    if(choosen(c)){
+        if(choosen(c+1)){
+            if(choosen(c-def)){
                 lastline=c-def+size;
             }
             else{
@@ -158,8 +163,7 @@ void whoIsLast(char c,int def,int size){
     }
 }
 
-
-void computerLogic(char c,int size,int turn){
+void computerLogic(char c,int size){
     lastline=' ';
     int count=0;
     int i=c-97;
@@ -185,7 +189,7 @@ void computerLogic(char c,int size,int turn){
     }
 }
 
-void isBox1(char c,int size,int turn){
+int isBox1(char c,int size){
     lastline=' ';
     int count=0;
     int i=c-97;
@@ -207,21 +211,28 @@ void isBox1(char c,int size,int turn){
         }
     }
     if(count==4){
-        if(turn%2==0){
+        if(turn==0){
         boxes[i]='1';
+        return 1;
         }
         else{
             boxes[i]='2';
+            return 2;
         }
     }
+    else{
+        // boxes[i]=' ';
+        return 0;
+    }
+
 }
 
-void isBox2(char c,int size,int turn){
+void isBox2(char c,int size){
     char a,b;
     a=32+((c%65)/size);
-    isBox1(c+a,size,turn);
+    isBox1(c+a,size);
     b=(32-size)+((c%(65+size))/size);
-    isBox1(c+b,size,turn);
+    isBox1(c+b,size);
     
 }
 
@@ -246,8 +257,8 @@ bool valid(char x,int size){
     }
 }
 
-bool repeated(char x,int b){
-    for(int i=0;i<=b;i++){
+bool repeated(char x){
+    for(int i=0;i<=60;i++){
         if(usedChars[i]==x){
             printf("Already taken\n");
             return 1;
@@ -262,6 +273,15 @@ bool filled(){
             for(int j=0;j<30;j++){
                 boxes2[j]=boxes[j];
             }
+            return 1;
+        }
+    }
+    return 0;
+}
+
+bool filled2(){
+    for(int i=0;i<30;i++){
+        if(boxes[i]!=boxes2[i]){
             return 1;
         }
     }
@@ -289,10 +309,10 @@ int score2(){
 }
 
 
-void printHorizontel(int index,char x,int size,int turn){
+void printHorizontel(char x,int size){
     for(int j=0;j<size;j++){
                 printf("*");
-                if(choosen(upper,index)==1){
+                if(choosen(upper)==1){
                     if(p1.color==1){
                         printf(BRED "-----" reset);
                     }
@@ -306,7 +326,7 @@ void printHorizontel(int index,char x,int size,int turn){
                         printf(BYEL "-----" reset);
                     }
                 }
-                else if(choosen(upper,index)==2){
+                else if(choosen(upper)==2){
                     if(p2.color==1){
                         printf(BRED "-----" reset);
                     }
@@ -330,8 +350,8 @@ void printHorizontel(int index,char x,int size,int turn){
             }
 }
 
-void printNumInBox(int index,int i,int q){
-    if(choosen(lower,index)==1){
+void printNumInBox(int i,int q){
+    if(choosen(lower)==1){
                     if(i%2!=0){
                         if(p1.color==1){
                             printf(BRED "|     " reset);
@@ -431,7 +451,7 @@ void printNumInBox(int index,int i,int q){
                         }
                     }
                 }
-                else if(choosen(lower,index)==2){
+                else if(choosen(lower)==2){
                     if(i%2!=0){
                         if(p2.color==1){
                             printf(BRED "|     " reset);
@@ -533,21 +553,21 @@ void printNumInBox(int index,int i,int q){
                 }
 }
 
-void printVertical(int index,char x,int size,int turn,int i){
+void printVertical(char x,int size,int i){
     int q;
     for(int j=0;j<size+1;j++){
                 if(x>=97 && x<=126){
-                    isBox1(x,size,turn);
+                    isBox1(x,size);
                     if(x!='a'){
-                    isBox1(x-1,size,turn);
+                    isBox1(x-1,size);
                     }
                 }
                 else{
-                    isBox2(x,size,turn);
+                    isBox2(x,size);
                 }
                 q=(i/4)*(size+1)+j;
-                if(choosen(lower,index)!=0){
-                    printNumInBox(index,i,q);
+                if(choosen(lower)!=0){
+                    printNumInBox(i,q);
                 } 
                 else{
                     if(i%2!=0){
@@ -561,18 +581,18 @@ void printVertical(int index,char x,int size,int turn,int i){
             }
 }
 
-void printGrid(int index,char x,int size,int turn){
+void printGrid(char x,int size){
     upper=65,lower=96-size;
-    usedChars[index]=x;
-    turns[index]=(turn%2)+1;
+    usedChars[index1]=x;
+    turns[index1]=(turn%2)+1;
     for(int i=0;i<(4*size)+1;i++){
         if(i%4==0){
-            printHorizontel(index,x,size,turn);
+            printHorizontel(x,size);
             printf("\n"); 
             lower+=size+1;
         }
         else{
-            printVertical(index,x,size,turn,i);   
+            printVertical(x,size,i);   
             lower-=size+1;
             printf("\n");
         }
@@ -623,6 +643,12 @@ void printwinner(){
         else if(p1.color==4){
             cout<<BYEL<<p1.playername<<reset<<" WON\n\n";
         }
+        string x="aa";
+        FILE *pF=fopen("top10.txt","a");
+        fprintf(pF,"\n");
+        fprintf(pF,"%s",x);
+        fprintf(pF,"\n");
+        fclose(pF);
     }
     else if(score1()<score2()){
         if(p2.color==1){
@@ -637,6 +663,11 @@ void printwinner(){
         else if(p2.color==4){
             cout<<BYEL<<p2.playername<<reset<<" WON\n\n";
         }
+        FILE *pF=fopen("top10.txt","a");
+        fprintf(pF,"\n");
+        fprintf(pF,"\n%s",p1.playername);
+        fprintf(pF,"\n");
+        fclose(pF);
     }
     else{
         printf("DRAW\n") ;
@@ -670,10 +701,10 @@ void printmoves(){
     }
 }
 
-void printremaininglines(int size,int b){
+void printremaininglines(int size){
     int total=(size*(size+1))*2;
     int counter=0;
-    for(int i=0;i<b;i++){
+    for(int i=0;i<index1;i++){
         if(usedChars[i]!=0){
             counter++;
         }
@@ -681,118 +712,82 @@ void printremaininglines(int size,int b){
     cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
 }
 
-void printtime(/*struct timespec begin*/time_t begin,/*struct timespec end*/time_t end){
-    /*===============for mac==============*/
-    // int sec=end.tv_sec-begin.tv_sec;
-    // int min=0;
-    // if(sec>59){
-    //     min=sec/60;
-    //     sec%=60;
-    // }
-    // cout<<"Time spent : ";
-    // cout<<BGRN<<"0"<<min;
-    // if(sec<10){
-    //     cout<<" : 0"<<sec<<reset<<"\n\n";
-    // }
-    // else{
-    //     cout<<" : "<<sec<<reset<<"\n\n";
-    // }
-    /*=============for windows=============*/
-    int sec=(end-begin)/CLOCKS_PER_SEC;
-    int min=0;
-        if(sec>59){
-        min=sec/60;
-        sec%=60;
-        }
-    cout<<"Time spent : ";
-    cout<<BGRN<<"0"<<min;
-    if(sec<10){
-        cout<<" : 0"<<sec<<reset<<"\n\n";
-    }
-    else{
-        cout<<" : "<<sec<<reset<<"\n\n";
-    }
-}
 
-void mode1(int index,int size,time_t begin/*struct timespec begin*/){
-    // struct timespec end;
-    time_t end2;
-    int turn=0;
-    char x=0;
+
+void mode1(int size){
+    int move=0;
+    int u1,u2;
+    char x=0,ans;
     enterplayers1();
-    printGrid(index,x,size,turn);
-    while(index!=(size*(size+1))*2){
-        // timespec_get(&end,TIME_UTC);
-        time_t end2=clock();
+    printGrid(x,size);
+    while(index1!=(size*(size+1))*2){
         printscores();
         printmoves();
-        printremaininglines(size,index);
-        printtime(begin,end2);
+        printremaininglines(size);
         printf("It's ");
-        printPlayer(turn);
+        printPlayer();
         printf(" turn\nEnter the letter of the line you want to choose : \n");
         cin>>x;
-        if(!valid(x,size) || repeated(x,index)){
+        if(!valid(x,size) || repeated(x)){
             continue;
         }
-        if(turn%2==0 ){
+        printGrid(x,size);
+        if(turn==0){
             NoMoves1++;
         }
         else{
             NoMoves2++;
         }
-        printGrid(index,x,size,turn);
-        index++; 
+        index1++; 
         if(!filled()){
-            turn++;
+            turn=(turn+1)%2;
+            for(int i=0;i<25;i++){
+                undoarr[i]=redoarr[i]=0;
+            }
+            index2=index3=0;
+            
         }
     }
 }
 
-void mode2(int index,int size,time_t begin/*struct timespec begin*/){
-    // struct timespec end;
-    time_t end;
-    int turn=0;
+void mode2(int size){
     char x=0;
     enterplayers2();
-    printGrid(index,x,size,turn);
-    while(index!=(size*(size+1))*2){
-        if(turn%2==0){
-            // timespec_get(&end,TIME_UTC);
-            time_t end=clock();
+    printGrid(x,size);
+    while(index1!=(size*(size+1))*2){
+        if(turn==0){
             printscores();
             printmoves();
-            printremaininglines(size,index);
-            printtime(begin,end);
+            printremaininglines(size);
             printf("It's ");
-            printPlayer(turn);
+            printPlayer();
             printf(" turn\nEnter the letter of the line you want to choose : \n");
             cin>>x;
-            if(!valid(x,size) || repeated(x,index)){
+            if(!valid(x,size) || repeated(x)){
                 continue;
             }
                 NoMoves1++;
-            printGrid(index,x,size,turn);
-            index++; 
+            printGrid(x,size);
+            index1++; 
         }
         else{
             x='0';
             for(int i=97;i<97+(size*(size+1));i++){
-                if(!choosen(i,index)){
+                if(!choosen(i)){
                     x=i;
                     break;
                 }
             }   
             if(x=='0'){
                 for(int i=65;i<65+(size*(size+1));i++){
-                    if(!choosen(i,index)){
+                    if(!choosen(i)){
                         x=i;
                         break;
                     }
                 }  
             }
             for(int i=97;i<97+(size*(size+1));i++){
-                    computerLogic(i,size,turn);
+                    computerLogic(i,size);
                     if(lastline!=' '){
                         break;
                     }
@@ -801,33 +796,131 @@ void mode2(int index,int size,time_t begin/*struct timespec begin*/){
                 x=lastline;
             }
             NoMoves2++;
-            printGrid(index,x,size,turn);
-            index++; 
+            printGrid(x,size);
+            index1++; 
         }
         if(!filled()){
-            turn++;
+            turn=(turn+1)%2;
         }
     }
 }
 
-int main(){
-    // struct timespec begin,end2;             /* for mac */
-    // timespec_get(&begin,TIME_UTC);
-    time_t begin=clock();                       /* for windows */
-    int index=0;
+
+
+void newGame(){
     int size=chooseLevel();
     int mode=choosemode();
     if(mode==1){
-        mode1(index,size,begin);
+        mode1(size);
     }
     else{
-        mode2(index,size,begin);
+        mode2(size);
     }
-    // timespec_get (&end2,TIME_UTC);
-    time_t end2=clock();
     printscores();
     printmoves();
-    printremaininglines(size,(size*(size+1)*2));
-    printtime(begin,end2);
+    printremaininglines(size);
     printwinner();
+}
+
+void menu();
+void top10(){
+    FILE *pF=fopen("top10.txt","r");
+    vector <string> winners(0); 
+    char buffer[255];
+    while(fgets(buffer,255,pF)!=NULL){
+        winners.push_back(buffer);
+    }
+    fclose(pF);
+    int plyedMatches=winners.size();
+    string sotedWinners[plyedMatches];
+    int sortedWinners2[plyedMatches];
+    for(int i=0;i<plyedMatches;i++){
+        sortedWinners2[i]=0;
+    }
+    int index1=0;
+    for(int i=0;i<winners.size();i++){
+        string name=winners[i];
+        sotedWinners[index1]=name;
+        if(name=="0"){
+            continue;
+        }
+        for(int j=i;j<winners.size();j++){
+            if(winners[j]==name){
+                sortedWinners2[index1]++;
+                winners[j]="0";
+            }
+        }
+        index1++;
+        if(index1==plyedMatches){
+            index1--;
+            break;
+        }
+    }
+
+    for(int i=0;i<plyedMatches;i++){
+        for(int j=0;j<plyedMatches-1;j++){
+            if(sortedWinners2[j]<sortedWinners2[j+1]){
+                swap(sortedWinners2[j],sortedWinners2[j+1]);
+                swap(sotedWinners[j],sotedWinners[j+1]);
+            }
+        }
+    }
+
+    string topPlayers[11];
+    if(index1>11){
+        for(int i=0;i<11;i++){
+            topPlayers[i]=sotedWinners[i];
+        }
+        for(int i=1;i<11;i++){
+            cout<<i<<"- "<<topPlayers[i];
+        }
+    }
+    else{
+        for(int i=0;i<index1;i++){
+            topPlayers[i]=sotedWinners[i];
+        }
+        for(int i=1;i<index1;i++){
+            cout<<i<<"- "<<topPlayers[i];
+        }
+    }
+
+    char ans='0';
+    printf("Press\n1-menu\n2-exit\n");
+    while(ans!='1' || ans!='2'){
+        cin>>ans;
+        if(ans=='1'){
+            menu();
+        }
+        else if(ans=='2'){
+            return;
+        }
+        else{
+            printf("Invalid Choice");
+        }
+    }
+}
+
+void menu(){
+    char ans;
+    printf("Press\n1-New game\n2-load saved game\n3-Top Players\n");
+    cin>>ans;
+    if(ans=='1'){
+        newGame();
+    }
+    else if(ans=='2'){
+        
+    }
+    else if(ans=='3'){
+        top10();
+    }
+    else{
+        printf("Invalid Choice\n");
+        menu();
+    }
+
+}
+
+int main(){
+    printf("== Welcome to Dots&Boxes game ==\n");
+    menu();
 }
