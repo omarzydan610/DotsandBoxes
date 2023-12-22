@@ -3,19 +3,16 @@
 #include<time.h>
 #include"ANSI-color-codes.h"
 #include<vector>
+#include<string.h>
 using namespace std;
 
-int NoMoves1=0,NoMoves2=0,upper,lower;
-char usedChars[60]={0};
-char turns[60]={0};
-char boxes[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-char boxes2[30]={' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-char undoarr[25]={0};
-char redoarr[25]={0};
-int index1=0,index2=0,index3=0;
-int turn=0;
+int index1,turn,NoMoves1,NoMoves2,upper,lower;
+char usedChars[60];
+char turns[60];
+char boxes[30];
+char boxes2[30];
 typedef struct{
-    string playername;
+    char name[100];
     int color;
     int score;
 }player;
@@ -52,8 +49,8 @@ int choosemode(){
 
 void enterplayers1(){
     printf("Enter player1 name : ");
-    cin>>p1.playername;
-    cout<<"Hi "<<p1.playername<<" ";
+    cin>>p1.name;
+    cout<<"Hi "<<p1.name<<" ";
     int ans=0;
     while(ans==0){
         printf("Choose your color\n");
@@ -67,8 +64,8 @@ void enterplayers1(){
         }
     }
     printf("Enter player2 name : ");
-    cin>>p2.playername;
-    cout<<"Hi "<<p2.playername<<" " ;
+    cin>>p2.name;
+    cout<<"Hi "<<p2.name<<" " ;
     ans=0;
     while(ans==0){
         printf("Choose your color\n");
@@ -88,8 +85,8 @@ void enterplayers1(){
 
 void enterplayers2(){
     printf("Enter your name : ");
-    cin>>p1.playername;
-    cout<<"Hi "<<p1.playername<<" ";
+    cin>>p1.name;
+    cout<<"Hi "<<p1.name<<" ";
     int ans=0;
     while(ans==0){
         printf("Choose your color\n");
@@ -102,7 +99,7 @@ void enterplayers2(){
             printf("Invalid Choice\n");
         }
     }
-    p2.playername="Computer";
+    strcpy(p2.name,"Computer");
     p2.color=4;
 }
 
@@ -117,28 +114,28 @@ int choosen(char a){
 
 void printPlayer(){
     if(turn==0 && p1.color==1){
-        cout<<BRED<<p1.playername<<reset;
+        cout<<BRED<<p1.name<<reset;
     }
     else if(turn==0 && p1.color==2){
-        cout<<BBLU<<p1.playername<<reset;
+        cout<<BBLU<<p1.name<<reset;
     }
     else if(turn==0 && p1.color==3){
-        cout<<BMAG<<p1.playername<<reset;
+        cout<<BMAG<<p1.name<<reset;
     }
     else if(turn==0&& p1.color==4){
-        cout<<BYEL<<p1.playername<<reset;
+        cout<<BYEL<<p1.name<<reset;
     }
     else if(turn==1 && p2.color==1){
-        cout<<BRED<<p2.playername<<reset;
+        cout<<BRED<<p2.name<<reset;
     }
     else if(turn==1 && p2.color==2){
-        cout<<BBLU<<p2.playername<<reset;
+        cout<<BBLU<<p2.name<<reset;
     }
     else if(turn==1 && p2.color==3){
-        cout<<BMAG<<p2.playername<<reset;
+        cout<<BMAG<<p2.name<<reset;
     }
     else if(turn==1 && p2.color==4){
-        cout<<BYEL<<p2.playername<<reset;
+        cout<<BYEL<<p2.name<<reset;
     }
 }
 
@@ -632,42 +629,43 @@ void printscores(){
 void printwinner(){
     if(score1()>score2()){
         if(p1.color==1){
-            cout<<BRED<<p1.playername<<reset<<" WON\n\n";
+            cout<<BRED<<p1.name<<reset<<" WON\n\n";
         }
         else if(p1.color==2){
-            cout<<BBLU<<p1.playername<<reset<<" WON\n\n";
+            cout<<BBLU<<p1.name<<reset<<" WON\n\n";
         }
         else if(p1.color==3){
-            cout<<BMAG<<p1.playername<<reset<<" WON\n\n";
+            cout<<BMAG<<p1.name<<reset<<" WON\n\n";
         }
         else if(p1.color==4){
-            cout<<BYEL<<p1.playername<<reset<<" WON\n\n";
+            cout<<BYEL<<p1.name<<reset<<" WON\n\n";
         }
-        string x="aa";
-        FILE *pF=fopen("top10.txt","a");
+        FILE *pF=fopen("winners.txt","a");
         fprintf(pF,"\n");
-        fprintf(pF,"%s",x);
-        fprintf(pF,"\n");
+        fputs(p1.name,pF);
+        fprintf(pF,"\n\n");
         fclose(pF);
     }
     else if(score1()<score2()){
         if(p2.color==1){
-            cout<<BRED<<p2.playername<<reset<<" WON\n\n";
+            cout<<BRED<<p2.name<<reset<<" WON\n\n";
         }
         else if(p2.color==2){
-            cout<<BBLU<<p2.playername<<reset<<" WON\n\n";
+            cout<<BBLU<<p2.name<<reset<<" WON\n\n";
         }
         else if(p2.color==3){
-            cout<<BMAG<<p2.playername<<reset<<" WON\n\n";
+            cout<<BMAG<<p2.name<<reset<<" WON\n\n";
         }
         else if(p2.color==4){
-            cout<<BYEL<<p2.playername<<reset<<" WON\n\n";
+            cout<<BYEL<<p2.name<<reset<<" WON\n\n";
         }
-        FILE *pF=fopen("top10.txt","a");
-        fprintf(pF,"\n");
-        fprintf(pF,"\n%s",p1.playername);
-        fprintf(pF,"\n");
-        fclose(pF);
+        if(strcmp(p2.name,"Computer")!=0){
+            FILE *pF=fopen("winners.txt","a");
+            fprintf(pF,"\n");
+            fputs(p2.name,pF);
+            fprintf(pF,"\n\n");
+            fclose(pF);
+        }
     }
     else{
         printf("DRAW\n") ;
@@ -676,28 +674,28 @@ void printwinner(){
 
 void printmoves(){
     if(p1.color==1){
-    cout<<BRED<<p1.playername<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
+    cout<<BRED<<p1.name<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
     }
     else if(p1.color==2){
-    cout<<BBLU<<p1.playername<<reset<<" Moved "<<BBLU<<NoMoves1<<reset<<" moves.\n";
+    cout<<BBLU<<p1.name<<reset<<" Moved "<<BBLU<<NoMoves1<<reset<<" moves.\n";
     }
     else if(p1.color==3){
-    cout<<BMAG<<p1.playername<<reset<<" Moved "<<BMAG<<NoMoves1<<reset<<" moves.\n";
+    cout<<BMAG<<p1.name<<reset<<" Moved "<<BMAG<<NoMoves1<<reset<<" moves.\n";
     }
     else if(p1.color==4){
-    cout<<BYEL<<p1.playername<<reset<<" Moved "<<BYEL<<NoMoves1<<reset<<" moves.\n";
+    cout<<BYEL<<p1.name<<reset<<" Moved "<<BYEL<<NoMoves1<<reset<<" moves.\n";
     }
     if(p2.color==1){
-    cout<<BRED<<p2.playername<<reset<<" Moved "<<BRED<<NoMoves2<<reset<<" moves.\n\n";
+    cout<<BRED<<p2.name<<reset<<" Moved "<<BRED<<NoMoves2<<reset<<" moves.\n\n";
     }
     else if(p2.color==2){
-    cout<<BBLU<<p2.playername<<reset<<" Moved "<<BBLU<<NoMoves2<<reset<<" moves.\n\n";
+    cout<<BBLU<<p2.name<<reset<<" Moved "<<BBLU<<NoMoves2<<reset<<" moves.\n\n";
     }
     else if(p2.color==3){
-    cout<<BMAG<<p2.playername<<reset<<" Moved "<<BMAG<<NoMoves2<<reset<<" moves.\n\n";
+    cout<<BMAG<<p2.name<<reset<<" Moved "<<BMAG<<NoMoves2<<reset<<" moves.\n\n";
     }
     else if(p2.color==4){
-    cout<<BYEL<<p2.playername<<reset<<" Moved "<<BYEL<<NoMoves2<<reset<<" moves.\n\n";
+    cout<<BYEL<<p2.name<<reset<<" Moved "<<BYEL<<NoMoves2<<reset<<" moves.\n\n";
     }
 }
 
@@ -741,11 +739,6 @@ void mode1(int size){
         index1++; 
         if(!filled()){
             turn=(turn+1)%2;
-            for(int i=0;i<25;i++){
-                undoarr[i]=redoarr[i]=0;
-            }
-            index2=index3=0;
-            
         }
     }
 }
@@ -808,6 +801,13 @@ void mode2(int size){
 
 
 void newGame(){
+    for(int i=0;i<60;i++){
+        usedChars[i]=turns[i]=0;
+    }
+    for(int i=0;i<30;i++){
+        boxes[i]=boxes2[i]=' ';
+    }
+    index1=turn=NoMoves1=NoMoves2=0;
     int size=chooseLevel();
     int mode=choosemode();
     if(mode==1){
@@ -823,8 +823,8 @@ void newGame(){
 }
 
 void menu();
-void top10(){
-    FILE *pF=fopen("top10.txt","r");
+void winners(){
+    FILE *pF=fopen("winners.txt","r");
     vector <string> winners(0); 
     char buffer[255];
     while(fgets(buffer,255,pF)!=NULL){
@@ -911,7 +911,7 @@ void menu(){
         
     }
     else if(ans=='3'){
-        top10();
+        winners();
     }
     else if(ans=='4'){
         return ;
