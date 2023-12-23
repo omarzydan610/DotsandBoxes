@@ -822,8 +822,7 @@ void newGame(){
     printwinner();
 }
 
-void menu();
-void winners(){
+void topTen(){
     FILE *pF=fopen("winners.txt","r");
     vector <string> winners(0); 
     char buffer[255];
@@ -883,26 +882,18 @@ void winners(){
             cout<<i<<"- "<<topPlayers[i];
         }
     }
+}
 
-    char ans='0';
-    printf("Press\n1-menu\n2-exit\n");
-    while(ans!='1' || ans!='2'){
-        cin>>ans;
-        if(ans=='1'){
-            menu();
-        }
-        else if(ans=='2'){
-            return;
-        }
-        else{
-            printf("Invalid Choice");
-        }
-    }
+void userManual(){
+    printf("Welcome to Dots&Boxes game\n\n");
+    printf("-The game consists of a grid of some boxes devided into lines.\n-Each player in his turn select one line\n");
+    printf("-The target is to close a box\n-The player who close a box his score increases by one and he have another turn\n");
+    printf("-The game ends when all lines are selected\n");
 }
 
 void menu(){
     char ans;
-    printf("Press\n1-New game\n2-load saved game\n3-Top Players\n4-exit\n");
+    printf("Press\n1-New Game\n2-Load Game\n3-Top Players\n4-User Manual\n5-Exit\n");
     cin>>ans;
     if(ans=='1'){
         newGame();
@@ -911,10 +902,13 @@ void menu(){
         
     }
     else if(ans=='3'){
-        winners();
+        topTen();
     }
     else if(ans=='4'){
-        return ;
+        userManual();
+    }
+    else if(ans=='5'){
+        return;
     }
     else{
         printf("Invalid Choice\n");
