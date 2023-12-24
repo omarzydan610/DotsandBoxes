@@ -626,38 +626,111 @@ void printscores(){
     }
 }
 
+
+
+int winner(int ans,char name[],int len){
+    FILE *pF=fopen("winners.txt","r");
+    vector <string> winners(0); 
+    char buffer[255];
+    while(fgets(buffer,255,pF)!=NULL){
+        winners.push_back(buffer);
+    }
+    fclose(pF);
+    int plyedMatches=winners.size();
+    string sotedWinners[plyedMatches];
+    int sortedWinners2[plyedMatches];
+    for(int i=0;i<plyedMatches;i++){
+        sortedWinners2[i]=0;
+    }
+    int index1=0;
+    for(int i=0;i<winners.size();i++){
+        string name=winners[i];
+        sotedWinners[index1]=name;
+        if(name=="0"){
+            continue;
+        }
+        for(int j=i;j<winners.size();j++){
+            if(winners[j]==name){
+                sortedWinners2[index1]++;
+                winners[j]="0";
+            }
+        }
+        index1++;
+        if(index1==plyedMatches){
+            index1--;
+            break;
+        }
+    }
+
+    for(int i=0;i<plyedMatches;i++){
+        for(int j=0;j<plyedMatches-1;j++){
+            if(sortedWinners2[j]<sortedWinners2[j+1]){
+                swap(sortedWinners2[j],sortedWinners2[j+1]);
+                swap(sotedWinners[j],sotedWinners[j+1]);
+            }
+        }
+    }
+
+    int score,rank;
+    for(int i=0;i<plyedMatches;i++){
+        int flag=1;
+        for (int j=0;j<len;j++){
+            if(name[j]!=sotedWinners[i][j]){
+                flag=0;
+                break;
+            }
+        }
+        if(flag==0){
+            continue;
+        }
+        else{
+            rank=i;
+            score=sortedWinners2[i];
+        }
+    }
+    if(ans==1){
+        return score;
+    }
+    else{
+        return rank;
+    }
+
+}
+
 void printwinner(){
     if(score1()>score2()){
         if(p1.color==1){
-            cout<<BRED<<p1.name<<reset<<" WON\n\n";
+            cout<<BRED<<p1.name<<reset<<" WON\n";
         }
         else if(p1.color==2){
-            cout<<BBLU<<p1.name<<reset<<" WON\n\n";
+            cout<<BBLU<<p1.name<<reset<<" WON\n";
         }
         else if(p1.color==3){
-            cout<<BMAG<<p1.name<<reset<<" WON\n\n";
+            cout<<BMAG<<p1.name<<reset<<" WON\n";
         }
         else if(p1.color==4){
-            cout<<BYEL<<p1.name<<reset<<" WON\n\n";
+            cout<<BYEL<<p1.name<<reset<<" WON\n";
         }
         FILE *pF=fopen("winners.txt","a");
         fprintf(pF,"\n");
         fputs(p1.name,pF);
         fprintf(pF,"\n\n");
         fclose(pF);
+        printf("Your current score is %i\n",winner(1,p1.name,strlen(p1.name)));
+        printf("Your current rank is %i\n",winner(2,p1.name,strlen(p1.name)));
     }
     else if(score1()<score2()){
         if(p2.color==1){
-            cout<<BRED<<p2.name<<reset<<" WON\n\n";
+            cout<<BRED<<p2.name<<reset<<" WON\n";
         }
         else if(p2.color==2){
-            cout<<BBLU<<p2.name<<reset<<" WON\n\n";
+            cout<<BBLU<<p2.name<<reset<<" WON\n";
         }
         else if(p2.color==3){
-            cout<<BMAG<<p2.name<<reset<<" WON\n\n";
+            cout<<BMAG<<p2.name<<reset<<" WON\n";
         }
         else if(p2.color==4){
-            cout<<BYEL<<p2.name<<reset<<" WON\n\n";
+            cout<<BYEL<<p2.name<<reset<<" WON\n";
         }
         if(strcmp(p2.name,"Computer")!=0){
             FILE *pF=fopen("winners.txt","a");
@@ -665,6 +738,8 @@ void printwinner(){
             fputs(p2.name,pF);
             fprintf(pF,"\n\n");
             fclose(pF);
+        printf("Your current score is %i\n",winner(1,p2.name,strlen(p2.name)));
+        printf("Your current rank is %i\n",winner(2,p2.name,strlen(p2.name)));
         }
     }
     else{
@@ -884,6 +959,10 @@ void topTen(){
     }
 }
 
+
+
+
+
 void userManual(){
     printf("Welcome to Dots&Boxes game\n\n");
     printf("-The game consists of a grid of some boxes devided into lines.\n-Each player in his turn select one line\n");
@@ -893,7 +972,7 @@ void userManual(){
 
 void menu(){
     char ans;
-    printf("Press\n1-New Game\n2-Load Game\n3-Top Players\n4-User Manual\n5-Exit\n");
+    printf("\nPress\n1-New Game\n2-Load Game\n3-Top Players\n4-User Manual\n5-Exit\n");
     cin>>ans;
     if(ans=='1'){
         newGame();
