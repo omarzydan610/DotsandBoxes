@@ -6,17 +6,25 @@
 #include<string.h>
 using namespace std;
 
-int index1,turn,NoMoves1,NoMoves2,upper,lower;
+int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower;
 char usedChars[60];
 char turns[60];
 char boxes[30];
 char boxes2[30];
+int undoarr[25][3][60]={0};
+int redoarr[25]={0};
+int moves=-1;
 typedef struct{
     char name[100];
     int color;
     int score;
 }player;
 player p1,p2;
+
+
+
+
+
 
 int chooseLevel(){
     int ans;
@@ -218,7 +226,6 @@ int isBox1(char c,int size){
         }
     }
     else{
-        // boxes[i]=' ';
         return 0;
     }
 
@@ -581,7 +588,9 @@ void printVertical(char x,int size,int i){
 void printGrid(char x,int size){
     upper=65,lower=96-size;
     usedChars[index1]=x;
-    turns[index1]=(turn%2)+1;
+    if(x!=0){
+        turns[index1]=(turn%2)+1;
+    }
     for(int i=0;i<(4*size)+1;i++){
         if(i%4==0){
             printHorizontel(x,size);
@@ -637,7 +646,7 @@ int winner(int ans,char name[],int len){
     }
     fclose(pF);
     int plyedMatches=winners.size();
-    string sotedWinners[plyedMatches];
+    string sortedwinners[plyedMatches];
     int sortedWinners2[plyedMatches];
     for(int i=0;i<plyedMatches;i++){
         sortedWinners2[i]=0;
@@ -645,7 +654,7 @@ int winner(int ans,char name[],int len){
     int index1=0;
     for(int i=0;i<winners.size();i++){
         string name=winners[i];
-        sotedWinners[index1]=name;
+        sortedwinners[index1]=name;
         if(name=="0"){
             continue;
         }
@@ -666,7 +675,7 @@ int winner(int ans,char name[],int len){
         for(int j=0;j<plyedMatches-1;j++){
             if(sortedWinners2[j]<sortedWinners2[j+1]){
                 swap(sortedWinners2[j],sortedWinners2[j+1]);
-                swap(sotedWinners[j],sotedWinners[j+1]);
+                swap(sortedwinners[j],sortedwinners[j+1]);
             }
         }
     }
@@ -675,7 +684,7 @@ int winner(int ans,char name[],int len){
     for(int i=0;i<plyedMatches;i++){
         int flag=1;
         for (int j=0;j<len;j++){
-            if(name[j]!=sotedWinners[i][j]){
+            if(name[j]!=sortedwinners[i][j]){
                 flag=0;
                 break;
             }
@@ -747,6 +756,20 @@ void printwinner(){
     }
 }
 
+void calculateMoves(){
+    int count1=0,count2=0;
+    for(int i=0;i<60;i++){
+        if(turns[i]==1){
+            count1++;
+        }
+        else if(turns[i]==2){
+            count2++;
+        }
+    }
+    NoMoves1=count1;
+    NoMoves2=count2;
+}
+
 void printmoves(){
     if(p1.color==1){
     cout<<BRED<<p1.name<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
@@ -785,16 +808,113 @@ void printremaininglines(int size){
     cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
 }
 
+int maxredo=0;
+void undo(int size);
+void redo(int size){
+    turn++;
+    printf("%i\n",moves);
+    printf("%i\n",maxredo);
+    printGrid(char(redoarr[moves+1]),size);
+    index1++;
+    moves++;
+    if(moves==maxredo){
+        char ans;
+        cout<<"Press\n1-undo\n2-continue\n";
+        cin>>ans;
+        if(ans=='1'){
+            undo(size);
+        }
+    }
+    else{
+        char ans;
+        cout<<"Press\n1-undo\n2-redo\n3-continue\n";
+        cin>>ans;
+        if(ans=='1'){
+            undo(size);
+        }
+        else if(ans=='2'){
+            filled();
+            turn--;
+            redo(size);
+        }
+    }
+}
 
+void undo(int size){
+    turn--;
+    index1--;
+    redoarr[moves]=usedChars[index1];
+    for(int j=0;j<3;j++){
+        if(j==0){
+            for(int k=0;k<60;k++){
+                usedChars[k]=undoarr[moves][j][k];
+            }
+        }
+        else if(j==1){
+            for(int k=0;k<60;k++){
+                turns[k]=undoarr[moves][j][k];
+            }
+        }
+        else{
+            for(int k=0;k<30;k++){
+                boxes[k]=undoarr[moves][j][k];
+                boxes2[k]=boxes[k];
+            }
+        }
+    }
+    printGrid(0,size);
+    moves--;
+    if(moves>-1){
+        char ans;
+        cout<<"Press\n1-undo\n2-redo\n3-continue\n";
+        cin>>ans;
+        if(ans=='1'){
+            turn++;
+            undo(size);
+        }
+        else if(ans=='2'){
+            redo(size);
+        }
+    }
+    else{
+        char ans;
+        cout<<"Press\n1-redo\n2-continue\n";
+        cin>>ans;
+        if(ans=='1'){
+            redo(size);
+        }
+    }
+
+}
+void first(){
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[0][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[0][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[0][j][k]=boxes[k];
+                        boxes2[k]=boxes[k];
+                    }
+                }
+            }
+}
 
 void mode1(int size){
-    int move=0;
-    int u1,u2;
     char x=0,ans;
     enterplayers1();
     printGrid(x,size);
     while(index1!=(size*(size+1))*2){
+        moves++;
         printscores();
+        calculateMoves();
         printmoves();
         printremaininglines(size);
         printf("It's ");
@@ -802,18 +922,87 @@ void mode1(int size){
         printf(" turn\nEnter the letter of the line you want to choose : \n");
         cin>>x;
         if(!valid(x,size) || repeated(x)){
+            moves=-1;
             continue;
         }
         printGrid(x,size);
-        if(turn==0){
-            NoMoves1++;
+        char ans;
+        cout<<"Press\n1-undo\n2-continue\n";
+        cin>>ans;
+        if(ans=='1'){
+            index1++;
+            undo(size);
+            index1--;
         }
-        else{
-            NoMoves2++;
-        }
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[moves+1][j][k]=boxes[k];
+                    }
+                }
+            }
         index1++; 
         if(!filled()){
+            maxredo=0;
             turn=(turn+1)%2;
+            moves=-1;
+            for(int i=0;i<25;i++){
+                redoarr[i]=0;
+            }
+            for(int i=0;i<25;i++){
+                for(int j=0;j<3;j++){
+                    for(int k=0;k<60;k++){
+                        undoarr[i][j][k]=0;
+                    }
+                }
+            }
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[0][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[0][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[0][j][k]=boxes[k];
+                    }
+                }
+            }
+        }
+        else{
+            maxredo++;
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[moves+1][j][k]=boxes[k];
+                    }
+                }
+            }
         }
     }
 }
@@ -821,9 +1010,10 @@ void mode1(int size){
 void mode2(int size){
     char x=0;
     enterplayers2();
-    printGrid(x,size);
+    printGrid(0,size);
     while(index1!=(size*(size+1))*2){
         if(turn==0){
+            moves++;
             printscores();
             printmoves();
             printremaininglines(size);
@@ -832,11 +1022,86 @@ void mode2(int size){
             printf(" turn\nEnter the letter of the line you want to choose : \n");
             cin>>x;
             if(!valid(x,size) || repeated(x)){
+                moves--;
                 continue;
             }
-                NoMoves1++;
             printGrid(x,size);
+            char ans;
+            cout<<"Press\n1-undo\n2-continue\n";
+            cin>>ans;
+            if(ans=='1'){
+                index1++;
+                undo(size);
+                index1--;
+            }
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[moves+1][j][k]=boxes[k];
+                        }
+                    }
+                }
             index1++; 
+            if(!filled()){
+                turn=(turn+1)%2;
+                moves=-1;
+                for(int i=0;i<25;i++){
+                    redoarr[i]=0;
+                }
+                for(int i=0;i<25;i++){
+                    for(int j=0;j<3;j++){
+                        for(int k=0;k<60;k++){
+                            undoarr[i][j][k]=0;
+                        }
+                    }
+                }
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[0][j][k]=boxes[k];
+                        }
+                    }
+                }
+            }
+            else{
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[moves+1][j][k]=boxes[k];
+                        }
+                    }
+                }
+            }
         }
         else{
             x='0';
@@ -863,17 +1128,14 @@ void mode2(int size){
             if(lastline!=' '){
                 x=lastline;
             }
-            NoMoves2++;
             printGrid(x,size);
             index1++; 
-        }
-        if(!filled()){
-            turn=(turn+1)%2;
+            if(!filled()){
+                turn=(turn+1)%2;
+            }
         }
     }
 }
-
-
 
 void newGame(){
     for(int i=0;i<60;i++){
@@ -882,9 +1144,10 @@ void newGame(){
     for(int i=0;i<30;i++){
         boxes[i]=boxes2[i]=' ';
     }
-    index1=turn=NoMoves1=NoMoves2=0;
+    index1=turn=0;
     int size=chooseLevel();
     int mode=choosemode();
+    first();
     if(mode==1){
         mode1(size);
     }
@@ -892,6 +1155,7 @@ void newGame(){
         mode2(size);
     }
     printscores();
+    calculateMoves();
     printmoves();
     printremaininglines(size);
     printwinner();
@@ -906,7 +1170,7 @@ void topTen(){
     }
     fclose(pF);
     int plyedMatches=winners.size();
-    string sotedWinners[plyedMatches];
+    string sortedwinners[plyedMatches];
     int sortedWinners2[plyedMatches];
     for(int i=0;i<plyedMatches;i++){
         sortedWinners2[i]=0;
@@ -914,7 +1178,7 @@ void topTen(){
     int index1=0;
     for(int i=0;i<winners.size();i++){
         string name=winners[i];
-        sotedWinners[index1]=name;
+        sortedwinners[index1]=name;
         if(name=="0"){
             continue;
         }
@@ -935,33 +1199,30 @@ void topTen(){
         for(int j=0;j<plyedMatches-1;j++){
             if(sortedWinners2[j]<sortedWinners2[j+1]){
                 swap(sortedWinners2[j],sortedWinners2[j+1]);
-                swap(sotedWinners[j],sotedWinners[j+1]);
+                swap(sortedwinners[j],sortedwinners[j+1]);
             }
         }
     }
 
     string topPlayers[11];
+    printf("\n");
     if(index1>11){
         for(int i=0;i<11;i++){
-            topPlayers[i]=sotedWinners[i];
+            topPlayers[i]=sortedwinners[i];
         }
         for(int i=1;i<11;i++){
-            cout<<i<<"- "<<topPlayers[i];
+            cout<<i<<"- "<<topPlayers[i]<<"   "<<sortedWinners2[i]<<"\n\n";
         }
     }
     else{
         for(int i=0;i<index1;i++){
-            topPlayers[i]=sotedWinners[i];
+            topPlayers[i]=sortedwinners[i];
         }
         for(int i=1;i<index1;i++){
-            cout<<i<<"- "<<topPlayers[i];
+            cout<<i<<"- "<<topPlayers[i]<<"   "<<sortedWinners2[i]<<"\n\n";
         }
     }
 }
-
-
-
-
 
 void userManual(){
     printf("Welcome to Dots&Boxes game\n\n");
