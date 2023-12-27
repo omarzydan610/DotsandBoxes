@@ -7,15 +7,12 @@
 #include<unistd.h>
 using namespace std;
 
-int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower;
+int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower,size2,mod2,moves=-1;
 char usedChars[60];
 int turns[60];
-char boxes[30];
-char boxes2[30];
+char boxes[30],boxes2[30];
 int undoarr[25][3][60]={0};
 int redoarr[25]={0};
-int moves=-1;
-int size2,mod2;
 typedef struct{
     char name[100];
     int color;
@@ -23,18 +20,15 @@ typedef struct{
 }player;
 player p1,p2;
 
-
-
-
 int chooseLevel(){
-    int ans;
+    char ans;
     printf("Choose your level\n1-Biginer\n2-Expert\n");
     cin>>ans;
-    if(ans==1){
+    if(ans=='1'){
         size2=2;
         return 2;
     }
-    else if(ans==2){
+    else if(ans=='2'){
         size2=5;
         return 5;
     }
@@ -45,16 +39,16 @@ int chooseLevel(){
 }
 
 int choosemode(){
-    int ans;
+    char ans;
     printf("Choose Mode\n1-1 VS 1\n2-Player VS Computer\n");
     cin>>ans;
-    if(ans==1){
+    if(ans=='1'){
         mod2=1;
-        return ans;
+        return 1;
     }
-    else if(ans==2){
+    else if(ans=='2'){
         mod2=2;
-        return ans;
+        return 2;
     }
     else{
         printf("Invalid Choice\n");
@@ -67,12 +61,14 @@ void enterplayers1(){
     cin>>p1.name;
     cout<<"Hi "<<p1.name<<" ";
     int ans=0;
+    char c1,c2;
     while(ans==0){
         printf("Choose your color\n");
         printf("1-Red\n2-Blue\n3-Pink\n4-Yellow\n");
-        cin>>p1.color;
-        if(p1.color>0 && p1.color<5){
+        cin>>c1;
+        if(c1=='1' || c1=='2' || c1=='3'|| c1=='4'){
             ans=1;
+            p1.color=c1-'0';
         }
         else{
             printf("Invalid Choice\n");
@@ -85,12 +81,13 @@ void enterplayers1(){
     while(ans==0){
         printf("Choose your color\n");
         printf("1-Red\n2-Blue\n3-Pink\n4-Yellow\n");
-        cin>>p2.color;
-        if(p2.color==p1.color){
+        cin>>c2;
+        if(c1==c2){
             printf("Already taken\n");
         }
-        else if(p2.color>0&&p2.color<5){
+        else if(c2=='1' || c2=='2' || c2=='3'|| c2=='4'){
             ans=1;
+            p2.color=c2-'0';
         }
         else{
             printf("Invalid Choice\n");
@@ -103,12 +100,14 @@ void enterplayers2(){
     cin>>p1.name;
     cout<<"Hi "<<p1.name<<" ";
     int ans=0;
+    char c1;
     while(ans==0){
         printf("Choose your color\n");
         printf("1-Red\n2-Blue\n3-Pink\n");
-        cin>>p1.color;
-        if(p1.color>0 && p1.color<4){
+        cin>>c1;
+        if(c1=='1' || c1=='2' || c1=='3'){
             ans=1;
+            p1.color=c1-'0';
         }
         else{
             printf("Invalid Choice\n");
@@ -153,7 +152,6 @@ void printPlayer(){
         cout<<BYEL<<p2.name<<reset;
     }
 }
-
 
 char lastline=' ';
 void whoIsLast(char c,int def,int size){
@@ -318,7 +316,6 @@ void score2(){
     }
     p2.score=counter2;
 }
-
 
 void printHorizontel(char x,int size){
     for(int j=0;j<size;j++){
@@ -613,7 +610,6 @@ void printGrid(char x,int size){
     printf("\n");
 }
 
-
 void printscores(){
     score1();
     score2();
@@ -643,8 +639,6 @@ void printscores(){
         printf(BYEL"%i\n\n" reset,p2.score);
     }
 }
-
-
 
 int winner(int ans,char name[],int len){
     FILE *pF=fopen("winners.txt","r");
@@ -818,6 +812,7 @@ void printremaininglines(int size){
     }
     cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
 }
+
 void save(){
     printf("Enter Name\n");
     FILE *sg=fopen("savedGames.txt","r");
@@ -887,30 +882,52 @@ int maxredo=0;
 void undo(int size);
 void redo(int size){
     turn++;
-    printf("%i\n",moves);
-    printf("%i\n",maxredo);
+
     printGrid(char(redoarr[moves+1]),size);
     index1++;
     moves++;
     if(moves==maxredo){
         char ans;
-        cout<<"Press\n1-undo\n2-continue\n";
-        cin>>ans;
-        if(ans=='1'){
-            undo(size);
+        char ans2=0;
+        while(ans2==0){
+            cout<<"Press\n1-undo\n2-continue\n";
+            cin>>ans;
+            if(ans=='1'){
+                ans2=1;
+                undo(size);
+            }
+            else if(ans=='2'){
+                ans2=1;
+                return;
+            }
+            else{
+                printf("Invalid Choice\n");
+            }
         }
     }
     else{
         char ans;
-        cout<<"Press\n1-undo\n2-redo\n3-continue\n";
-        cin>>ans;
-        if(ans=='1'){
-            undo(size);
-        }
-        else if(ans=='2'){
-            filled();
-            turn--;
-            redo(size);
+        char ans2=0;
+        while(ans2==0){
+            cout<<"Press\n1-undo\n2-redo\n3-continue\n";
+            cin>>ans;
+            if(ans=='1'){
+                ans2=1;
+                undo(size);
+            }
+            else if(ans=='2'){
+                ans2=1;
+                filled();
+                turn--;
+                redo(size);
+            }
+            else if(ans=='3'){
+                ans2=1;
+                return;
+            }
+            else{
+                printf("Invalid Choice\n");
+            }
         }
     }
 }
@@ -941,26 +958,50 @@ void undo(int size){
     moves--;
     if(moves>-1){
         char ans;
-        cout<<"Press\n1-undo\n2-redo\n3-continue\n";
-        cin>>ans;
-        if(ans=='1'){
-            turn++;
-            undo(size);
-        }
-        else if(ans=='2'){
-            redo(size);
+        char ans2=0;
+        while(ans2==0){
+            cout<<"Press\n1-undo\n2-redo\n3-continue\n";
+            cin>>ans;
+            if(ans=='1'){
+                ans2=1;
+                turn++;
+                undo(size);
+            }
+            else if(ans=='2'){
+                ans2=1;
+                redo(size);
+            }
+            else if(ans=='3'){
+                ans2=1;
+                return;
+            }
+            else{
+                printf("Invalid Choice\n");
+            }
         }
     }
     else{
         char ans;
-        cout<<"Press\n1-redo\n2-continue\n";
-        cin>>ans;
-        if(ans=='1'){
-            redo(size);
+        char ans2=0;
+        while(ans2==0){
+            cout<<"Press\n1-redo\n2-continue\n";
+            cin>>ans;
+            if(ans=='1'){
+                ans2=1;
+                redo(size);
+            }
+            else if(ans=='2'){
+                ans2=1;
+                return;
+            }
+            else{
+                printf("Invalid Choice\n");
+            }
         }
     }
 
 }
+
 void first(){
             for(int j=0;j<3;j++){
                 if(j==0){
@@ -981,6 +1022,7 @@ void first(){
                 }
             }
 }
+
 void continueGame1(int size){
     char x=0,ans;
     printGrid(x,size);
@@ -999,35 +1041,48 @@ void continueGame1(int size){
             continue;
         }
         printGrid(x,size);
-        char ans;
-        cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
-        cin>>ans;
-        if(ans=='1'){
-            index1++;
-            undo(size);
-            index1--;
-        }
-        else if(ans=='3'){
-            save();
-            return;
-        }
-            for(int j=0;j<3;j++){
-                if(j==0){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=usedChars[k];
-                    }
+        if(index1+1!=(size*(size+1))*2){
+            char ans;
+            char ans2=0;
+            while(ans2==0){
+                cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+                cin>>ans;
+                if(ans=='1'){
+                    ans2=1;
+                    index1++;
+                    undo(size);
+                    index1--;
                 }
-                else if(j==1){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=turns[k];
-                    }
+                else if(ans=='2'){
+                    ans2=1;
+                }
+                else if(ans=='3'){
+                    ans2=1;
+                    save();
+                    return;
                 }
                 else{
-                    for(int k=0;k<30;k++){
-                        undoarr[moves+1][j][k]=boxes[k];
-                    }
+                    printf("Invalid Choice\n");
                 }
             }
+        }
+        for(int j=0;j<3;j++){
+            if(j==0){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=usedChars[k];
+                }
+            }
+            else if(j==1){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=turns[k];
+                }
+            }
+            else{
+                for(int k=0;k<30;k++){
+                    undoarr[moves+1][j][k]=boxes[k];
+                }
+            }
+        }
         index1++; 
         if(!filled()){
             maxredo=0;
@@ -1083,6 +1138,7 @@ void continueGame1(int size){
         }
     }
 }
+
 void continueGame2(int size){
     char x=0;
     while(index1!=(size*(size+1))*2){
@@ -1101,31 +1157,48 @@ void continueGame2(int size){
                 continue;
             }
             printGrid(x,size);
-            char ans;
-            cout<<"Press\n1-undo\n2-continue\n";
-            cin>>ans;
-            if(ans=='1'){
-                index1++;
-                undo(size);
-                index1--;
-            }
-                for(int j=0;j<3;j++){
-                    if(j==0){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=usedChars[k];
-                        }
+            if(index1+1!=(size*(size+1))*2){
+                char ans;
+                char ans2=0;
+                while(ans2==0){
+                    cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+                    cin>>ans;
+                    if(ans=='1'){
+                        ans2=1;
+                        index1++;
+                        undo(size);
+                        index1--;
                     }
-                    else if(j==1){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=turns[k];
-                        }
+                    else if(ans=='2'){
+                        ans2=1;
+                    }
+                    else if(ans=='3'){
+                        ans2=1;
+                        save();
+                        return;
                     }
                     else{
-                        for(int k=0;k<30;k++){
-                            undoarr[moves+1][j][k]=boxes[k];
-                        }
+                        printf("Invalid Choice\n");
                     }
                 }
+            }
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[moves+1][j][k]=boxes[k];
+                    }
+                }
+            }
             index1++; 
             if(!filled()){
                 turn=(turn+1)%2;
@@ -1231,35 +1304,48 @@ void mode1(int size){
             continue;
         }
         printGrid(x,size);
-        char ans;
-        cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
-        cin>>ans;
-        if(ans=='1'){
-            index1++;
-            undo(size);
-            index1--;
-        }
-        else if(ans=='3'){
-            save();
-            return;
-        }
-            for(int j=0;j<3;j++){
-                if(j==0){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=usedChars[k];
-                    }
+        if(index1+1!=(size*(size+1))*2){
+            char ans;
+            char ans2=0;
+            while(ans2==0){
+                cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+                cin>>ans;
+                if(ans=='1'){
+                    ans2=1;
+                    index1++;
+                    undo(size);
+                    index1--;
                 }
-                else if(j==1){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=turns[k];
-                    }
+                else if(ans=='2'){
+                    ans2=1;
+                }
+                else if(ans=='3'){
+                    ans2=1;
+                    save();
+                    return;
                 }
                 else{
-                    for(int k=0;k<30;k++){
-                        undoarr[moves+1][j][k]=boxes[k];
-                    }
+                    printf("Invalid Choice\n");
                 }
             }
+        }
+        for(int j=0;j<3;j++){
+            if(j==0){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=usedChars[k];
+                }
+            }
+            else if(j==1){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=turns[k];
+                }
+            }
+            else{
+                for(int k=0;k<30;k++){
+                    undoarr[moves+1][j][k]=boxes[k];
+                }
+            }
+        }
         index1++; 
         if(!filled()){
             maxredo=0;
@@ -1336,35 +1422,48 @@ void mode2(int size){
                 continue;
             }
             printGrid(x,size);
-            char ans;
-            cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
-            cin>>ans;
-            if(ans=='1'){
-            index1++;
-            undo(size);
-            index1--;
-        }
-        else if(ans=='3'){
-            save();
-            return;
-        }
-                for(int j=0;j<3;j++){
-                    if(j==0){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=usedChars[k];
-                        }
+            if(index1+1!=(size*(size+1))*2){
+                char ans;
+                char ans2=0;
+                while(ans2==0){
+                    cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+                    cin>>ans;
+                    if(ans=='1'){
+                        ans2=1;
+                        index1++;
+                        undo(size);
+                        index1--;
                     }
-                    else if(j==1){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=turns[k];
-                        }
+                    else if(ans=='2'){
+                        ans2=1;
+                    }
+                    else if(ans=='3'){
+                        ans2=1;
+                        save();
+                        return;
                     }
                     else{
-                        for(int k=0;k<30;k++){
-                            undoarr[moves+1][j][k]=boxes[k];
-                        }
+                        printf("Invalid Choice\n");
                     }
                 }
+            }
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[moves+1][j][k]=boxes[k];
+                    }
+                }
+            }
             index1++; 
             if(!filled()){
                 turn=(turn+1)%2;
@@ -1475,6 +1574,7 @@ void newGame(){
     printremaininglines(size);
     printwinner();
 }
+
 void menu();
 
 void load(){
@@ -1567,7 +1667,10 @@ void load(){
         boxes2[j]=boxes2v[j][0];
     }
     index1++;
-    turn++;
+    if(!filled()){
+        turn=(turn+1)%2;
+    }
+    // turn=(turn+1)%2;
     first();
     if(mod2==1){
         continueGame1(size2);
@@ -1635,7 +1738,7 @@ void topTen(){
             topPlayers[i]=sortedwinners[i];
         }
         for(int i=1;i<11;i++){
-            cout<<i<<"- "<<topPlayers[i]<<"   "<<sortedWinners2[i]<<"\n\n";
+            cout<<i<<"- "<<topPlayers[i]<<"  Won "<<sortedWinners2[i]<<" times"<<"\n\n";
         }
     }
     else{
@@ -1643,7 +1746,7 @@ void topTen(){
             topPlayers[i]=sortedwinners[i];
         }
         for(int i=1;i<index1;i++){
-            cout<<i<<"- "<<topPlayers[i]<<"   "<<sortedWinners2[i]<<"\n\n";
+            cout<<i<<"- "<<topPlayers[i]<<"  Won "<<sortedWinners2[i]<<" times"<<"\n\n";
         }
     }
 }
@@ -1657,26 +1760,33 @@ void userManual(){
 
 void menu(){
     char ans;
-    printf("\nPress\n1-New Game\n2-Load Game\n3-Top Players\n4-User Manual\n5-Exit\n");
-    cin>>ans;
-    if(ans=='1'){
-        newGame();
-    }
-    else if(ans=='2'){
-        load();
-    }
-    else if(ans=='3'){
-        topTen();
-    }
-    else if(ans=='4'){
-        userManual();
-    }
-    else if(ans=='5'){
-        return;
-    }
-    else{
-        printf("Invalid Choice\n");
-        menu();
+    int ans2=0;
+    while(ans2==0){
+        printf("\nPress\n1-New Game\n2-Load Game\n3-Top Players\n4-User Manual\n5-Exit\n");
+        cin>>ans;
+        if(ans=='1'){
+            ans2=1;
+            newGame();
+        }
+        else if(ans=='2'){
+            ans2=1;
+            load();
+        }
+        else if(ans=='3'){
+            ans2=1;
+            topTen();
+        }
+        else if(ans=='4'){
+            ans2=1;
+            userManual();
+        }
+        else if(ans=='5'){
+            ans2=1;
+            return;
+        }
+        else{
+            printf("Invalid Choice\n");
+        }
     }
     menu();
 }
