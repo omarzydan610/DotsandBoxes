@@ -4,24 +4,24 @@
 #include"ANSI-color-codes.h"
 #include<vector>
 #include<string.h>
+#include<unistd.h>
 using namespace std;
 
 int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower;
 char usedChars[60];
-char turns[60];
+int turns[60];
 char boxes[30];
 char boxes2[30];
 int undoarr[25][3][60]={0};
 int redoarr[25]={0};
 int moves=-1;
+int size2,mod2;
 typedef struct{
     char name[100];
     int color;
-    int score;
+    int score=0;
 }player;
 player p1,p2;
-
-
 
 
 
@@ -31,9 +31,11 @@ int chooseLevel(){
     printf("Choose your level\n1-Biginer\n2-Expert\n");
     cin>>ans;
     if(ans==1){
+        size2=2;
         return 2;
     }
     else if(ans==2){
+        size2=5;
         return 5;
     }
     else{
@@ -46,7 +48,12 @@ int choosemode(){
     int ans;
     printf("Choose Mode\n1-1 VS 1\n2-Player VS Computer\n");
     cin>>ans;
-    if(ans==1 || ans==2){
+    if(ans==1){
+        mod2=1;
+        return ans;
+    }
+    else if(ans==2){
+        mod2=2;
         return ans;
     }
     else{
@@ -292,24 +299,24 @@ bool filled2(){
     return 0;
 }
 
-int score1(){
+void score1(){
     int counter1=0;
     for(int i=0;i<30;i++){
         if(boxes[i]=='1'){
             counter1++;
         }
     }
-    return counter1;
+    p1.score=counter1;
 }
 
-int score2(){
+void score2(){
     int counter2=0;
     for(int i=0;i<30;i++){
         if(boxes[i]=='2'){
             counter2++;
         }
     }
-    return counter2;
+    p2.score=counter2;
 }
 
 
@@ -608,30 +615,32 @@ void printGrid(char x,int size){
 
 
 void printscores(){
+    score1();
+    score2();
     printf("Current Score:\n     ");
     if(p1.color==1){
-        printf(BRED "%i  " reset,score1());
+        printf(BRED "%i  " reset,p1.score);
     }
     else if(p1.color==2){
-        printf(BBLU"%i  " reset,score1());
+        printf(BBLU"%i  " reset,p1.score);
     }
     else if(p1.color==3){
-        printf(BMAG"%i  " reset,score1());
+        printf(BMAG"%i  " reset,p1.score);
     }
     else if(p1.color==4){
-        printf(BYEL"%i  " reset,score1());
+        printf(BYEL"%i  " reset,p1.score);
     }
     if(p2.color==1){
-        printf(BRED"%i\n\n" reset,score2());
+        printf(BRED"%i\n\n" reset,p2.score);
     }
     else if(p2.color==2){
-        printf(BBLU"%i\n\n" reset,score2());
+        printf(BBLU"%i\n\n" reset,p2.score);
     }
     else if(p2.color==3){
-        printf(BMAG"%i\n\n" reset,score2());
+        printf(BMAG"%i\n\n" reset,p2.score);
     }
     else if(p2.color==4){
-        printf(BYEL"%i\n\n" reset,score2());
+        printf(BYEL"%i\n\n" reset,p2.score);
     }
 }
 
@@ -707,7 +716,9 @@ int winner(int ans,char name[],int len){
 }
 
 void printwinner(){
-    if(score1()>score2()){
+    score1();
+    score2();
+    if(p1.score>p2.score){
         if(p1.color==1){
             cout<<BRED<<p1.name<<reset<<" WON\n";
         }
@@ -728,7 +739,7 @@ void printwinner(){
         printf("Your current score is %i\n",winner(1,p1.name,strlen(p1.name)));
         printf("Your current rank is %i\n",winner(2,p1.name,strlen(p1.name)));
     }
-    else if(score1()<score2()){
+    else if(p1.score<p2.score){
         if(p2.color==1){
             cout<<BRED<<p2.name<<reset<<" WON\n";
         }
@@ -806,6 +817,70 @@ void printremaininglines(int size){
         }
     }
     cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
+}
+void save(){
+    printf("Enter Name\n");
+    FILE *sg=fopen("savedGames.txt","r");
+    vector <string> Games(0); 
+    char buffer[255];
+    while(fgets(buffer,255,sg)!=NULL){
+        Games.push_back(buffer);
+    }
+    char savingfile2[255];
+    char savingfile[255];
+    scanf("%s",&savingfile2);
+    int lent=strlen(savingfile2);
+    int ans=0;
+    int flag,flag2=0;
+    for(int i=0;i<Games.size();i++){
+        flag=1;
+        for(int j=0;j<255;j++){
+            if(savingfile2[j]!=Games[i][j]){
+                flag=0;
+                break;
+            }
+        }
+        if(flag==1){
+            cout<<"Already taken \n";
+            save();
+            return;
+        }
+    }
+    fclose(sg);
+    strcpy(savingfile,savingfile2);
+    strcat(savingfile,".txt");
+    FILE *opF=fopen(savingfile,"w");
+    fclose(opF);
+    FILE *pF=fopen(savingfile,"a");
+    fprintf(pF ,"%s\n",p1.name);
+    fprintf(pF ,"%d\n",p1.color);
+    fprintf(pF ,"%d\n",p1.score);
+    fprintf(pF ,"%s\n",p2.name);
+    fprintf(pF ,"%d\n",p2.color);
+    fprintf(pF ,"%d\n",p2.score);
+    fprintf(pF ,"%d\n",index1);
+    fprintf(pF ,"%d\n",turn);
+    fprintf(pF ,"%d\n",size2);
+    fprintf(pF ,"%d\n",mod2);
+    for(int i=0;i<60;i++){
+        fprintf(pF ,"%c\n",usedChars[i]);
+    }
+        fprintf(pF ,"%c",'\n');
+    for(int i=0;i<60;i++){
+        fprintf(pF ,"%i\n",turns[i]);
+    }
+        fprintf(pF ,"%c",'\n');
+    for(int i=0;i<30;i++){
+        fprintf(pF ,"%c\n",boxes[i]);
+    }
+        fprintf(pF ,"%c",'\n');
+    for(int i=0;i<30;i++){
+        fprintf(pF ,"%c\n",boxes2[i]);
+    }
+    fclose(pF);
+    FILE *sF=fopen("savedGames.txt","a");
+    fprintf(pF ,"\n%s",savingfile2);
+    fclose(sF);
 }
 
 int maxredo=0;
@@ -906,10 +981,8 @@ void first(){
                 }
             }
 }
-
-void mode1(int size){
+void continueGame1(int size){
     char x=0,ans;
-    enterplayers1();
     printGrid(x,size);
     while(index1!=(size*(size+1))*2){
         moves++;
@@ -927,12 +1000,16 @@ void mode1(int size){
         }
         printGrid(x,size);
         char ans;
-        cout<<"Press\n1-undo\n2-continue\n";
+        cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
         cin>>ans;
         if(ans=='1'){
             index1++;
             undo(size);
             index1--;
+        }
+        else if(ans=='3'){
+            save();
+            return;
         }
             for(int j=0;j<3;j++){
                 if(j==0){
@@ -1006,15 +1083,13 @@ void mode1(int size){
         }
     }
 }
-
-void mode2(int size){
+void continueGame2(int size){
     char x=0;
-    enterplayers2();
-    printGrid(0,size);
     while(index1!=(size*(size+1))*2){
         if(turn==0){
             moves++;
             printscores();
+            calculateMoves();
             printmoves();
             printremaininglines(size);
             printf("It's ");
@@ -1137,9 +1212,249 @@ void mode2(int size){
     }
 }
 
+void mode1(int size){
+    char x=0,ans;
+    enterplayers1();
+    printGrid(x,size);
+    while(index1!=(size*(size+1))*2){
+        moves++;
+        printscores();
+        calculateMoves();
+        printmoves();
+        printremaininglines(size);
+        printf("It's ");
+        printPlayer();
+        printf(" turn\nEnter the letter of the line you want to choose : \n");
+        cin>>x;
+        if(!valid(x,size) || repeated(x)){
+            moves=-1;
+            continue;
+        }
+        printGrid(x,size);
+        char ans;
+        cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+        cin>>ans;
+        if(ans=='1'){
+            index1++;
+            undo(size);
+            index1--;
+        }
+        else if(ans=='3'){
+            save();
+            return;
+        }
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[moves+1][j][k]=boxes[k];
+                    }
+                }
+            }
+        index1++; 
+        if(!filled()){
+            maxredo=0;
+            turn=(turn+1)%2;
+            moves=-1;
+            for(int i=0;i<25;i++){
+                redoarr[i]=0;
+            }
+            for(int i=0;i<25;i++){
+                for(int j=0;j<3;j++){
+                    for(int k=0;k<60;k++){
+                        undoarr[i][j][k]=0;
+                    }
+                }
+            }
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[0][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[0][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[0][j][k]=boxes[k];
+                    }
+                }
+            }
+        }
+        else{
+            maxredo++;
+            for(int j=0;j<3;j++){
+                if(j==0){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=usedChars[k];
+                    }
+                }
+                else if(j==1){
+                    for(int k=0;k<60;k++){
+                        undoarr[moves+1][j][k]=turns[k];
+                    }
+                }
+                else{
+                    for(int k=0;k<30;k++){
+                        undoarr[moves+1][j][k]=boxes[k];
+                    }
+                }
+            }
+        }
+    }
+}
+
+void mode2(int size){
+    char x=0;
+    enterplayers2();
+    printGrid(0,size);
+    while(index1!=(size*(size+1))*2){
+        if(turn==0){
+            moves++;
+            printscores();
+            calculateMoves();
+            printmoves();
+            printremaininglines(size);
+            printf("It's ");
+            printPlayer();
+            printf(" turn\nEnter the letter of the line you want to choose : \n");
+            cin>>x;
+            if(!valid(x,size) || repeated(x)){
+                moves--;
+                continue;
+            }
+            printGrid(x,size);
+            char ans;
+            cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+            cin>>ans;
+            if(ans=='1'){
+            index1++;
+            undo(size);
+            index1--;
+        }
+        else if(ans=='3'){
+            save();
+            return;
+        }
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[moves+1][j][k]=boxes[k];
+                        }
+                    }
+                }
+            index1++; 
+            if(!filled()){
+                turn=(turn+1)%2;
+                moves=-1;
+                for(int i=0;i<25;i++){
+                    redoarr[i]=0;
+                }
+                for(int i=0;i<25;i++){
+                    for(int j=0;j<3;j++){
+                        for(int k=0;k<60;k++){
+                            undoarr[i][j][k]=0;
+                        }
+                    }
+                }
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[0][j][k]=boxes[k];
+                        }
+                    }
+                }
+            }
+            else{
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[moves+1][j][k]=boxes[k];
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            x='0';
+            for(int i=97;i<97+(size*(size+1));i++){
+                if(!choosen(i)){
+                    x=i;
+                    break;
+                }
+            }   
+            if(x=='0'){
+                for(int i=65;i<65+(size*(size+1));i++){
+                    if(!choosen(i)){
+                        x=i;
+                        break;
+                    }
+                }  
+            }
+            for(int i=97;i<97+(size*(size+1));i++){
+                    computerLogic(i,size);
+                    if(lastline!=' '){
+                        break;
+                    }
+            }
+            if(lastline!=' '){
+                x=lastline;
+            }
+            printGrid(x,size);
+            index1++; 
+            if(!filled()){
+                turn=(turn+1)%2;
+            }
+        }
+    }
+}
+
 void newGame(){
     for(int i=0;i<60;i++){
-        usedChars[i]=turns[i]=0;
+        usedChars[i]=' ';
+        turns[i]=0;
     }
     for(int i=0;i<30;i++){
         boxes[i]=boxes2[i]=' ';
@@ -1159,6 +1474,115 @@ void newGame(){
     printmoves();
     printremaininglines(size);
     printwinner();
+}
+void menu();
+
+void load(){
+    char nlines;
+    FILE *sg=fopen("savedGames.txt","r");
+    vector <string> Games(0); 
+    char buffer[255];
+    if(fgets(buffer,255,sg)==NULL){
+        printf("No saved games.");
+        return;
+    }
+    while(fgets(buffer,255,sg)!=NULL){
+            Games.push_back(buffer);
+    }
+    fclose(sg);
+    for(int i=0;i<Games.size();i++){
+        cout<<i+1<<"- "<<Games[i];
+    }
+    cout<<endl;
+    cout<<"Enter game's name\n";
+    char loadedFile2[255]={'\0'};
+    cin>>loadedFile2;
+    strcat(loadedFile2,".txt");
+    // int flag=0;
+    // for(int i=0;i<Games.size();i++){
+    // for(int j=0;j<255;j++){
+    //         if(loadedFile2[j]==Games[i][j]){
+    //             flag++;
+    //             break;
+    //         }
+    //     }
+    // }
+    char *ptf=loadedFile2;
+    if(access(ptf,F_OK)==-1){
+        cout<<"Not exist\n";
+        menu();
+        return;
+    }
+    else{
+    FILE *pF=fopen(loadedFile2,"r");
+    fscanf(pF ,"%s",&p1.name);
+    fscanf(pF ,"%d",&p1.color);
+    fscanf(pF ,"%d",&p1.score);
+    fscanf(pF ,"%s",&p2.name);
+    fscanf(pF ,"%d",&p2.color);
+    fscanf(pF ,"%d",&p2.score);
+    fscanf(pF ,"%d",&index1);
+    fscanf(pF ,"%d",&turn);
+    fscanf(pF ,"%d",&size2);
+    fscanf(pF ,"%d",&mod2);
+    fscanf(pF ,"%c",&nlines);
+    int i=0;
+    vector <string> usedcharv(0); 
+    while(fgets(buffer,255,pF)!=NULL&&i<60){
+        usedcharv.push_back(buffer);
+        i++;
+    }
+    i=0;
+    vector <string> turnsv(0); 
+    while(fgets(buffer,255,pF)!=NULL&&i<60){
+        turnsv.push_back(buffer);
+        i++;
+    }
+    i=0;
+    vector <string> boxesv(0); 
+    while(fgets(buffer,255,pF)!=NULL&&i<30){
+        boxesv.push_back(buffer);
+        i++;
+    }
+    i=0;
+    vector <string> boxes2v(0); 
+    while(fgets(buffer,255,pF)!=NULL&&i<30){
+        boxes2v.push_back(buffer);
+        i++;
+    }
+    fclose(pF);
+    for(int j=0;j<60;j++){
+        usedChars[j]=usedcharv[j][0];
+    }
+    for(int l=0;l<60;l++){
+
+        char x=turnsv[l][0];
+        turns[l]=x-'0';
+
+    }
+    for(int j=0;j<30;j++){
+        boxes[j]=boxesv[j][0];
+    }
+    for(int j=0;j<30;j++){
+        boxes2[j]=boxes2v[j][0];
+    }
+    index1++;
+    turn++;
+    first();
+    if(mod2==1){
+        continueGame1(size2);
+    }
+    else{
+        continueGame2(size2);
+    }
+    printscores();
+    calculateMoves();
+    printmoves();
+    printremaininglines(size2);
+    printwinner();
+    // remove(loadedFile);
+    // return 0;
+    }
 }
 
 void topTen(){
@@ -1239,7 +1663,7 @@ void menu(){
         newGame();
     }
     else if(ans=='2'){
-        
+        load();
     }
     else if(ans=='3'){
         topTen();
