@@ -815,35 +815,13 @@ void printremaininglines(int size){
 
 void save(){
     printf("Enter Name\n");
-    FILE *sg=fopen("savedGames.txt","r");
-    vector <string> Games(0); 
-    char buffer[255];
-    while(fgets(buffer,255,sg)!=NULL){
-        Games.push_back(buffer);
-    }
     char savingfile2[255];
     char savingfile[255];
     scanf("%s",&savingfile2);
-    int lent=strlen(savingfile2);
-    int ans=0;
-    int flag,flag2=0;
-    for(int i=0;i<Games.size();i++){
-        flag=1;
-        for(int j=0;j<255;j++){
-            if(savingfile2[j]!=Games[i][j]){
-                flag=0;
-                break;
-            }
-        }
-        if(flag==1){
-            cout<<"Already taken \n";
-            save();
-            return;
-        }
-    }
-    fclose(sg);
     strcpy(savingfile,savingfile2);
     strcat(savingfile,".txt");
+    char *ptf=savingfile;
+    if(access(ptf,F_OK)==-1){
     FILE *opF=fopen(savingfile,"w");
     fclose(opF);
     FILE *pF=fopen(savingfile,"a");
@@ -876,6 +854,11 @@ void save(){
     FILE *sF=fopen("savedGames.txt","a");
     fprintf(pF ,"\n%s",savingfile2);
     fclose(sF);
+    }
+    else{
+        printf("already taken\n");
+        save();
+    }
 }
 
 int maxredo=0;
@@ -1023,7 +1006,7 @@ void first(){
             }
 }
 
-void continueGame1(int size){
+int continueGame1(int size){
     char x=0,ans;
     printGrid(x,size);
     while(index1!=(size*(size+1))*2){
@@ -1059,7 +1042,7 @@ void continueGame1(int size){
                 else if(ans=='3'){
                     ans2=1;
                     save();
-                    return;
+                    return 0;
                 }
                 else{
                     printf("Invalid Choice\n");
@@ -1087,7 +1070,7 @@ void continueGame1(int size){
         if(!filled()){
             maxredo=0;
             turn=(turn+1)%2;
-            moves=-1;
+            moves--;
             for(int i=0;i<25;i++){
                 redoarr[i]=0;
             }
@@ -1137,9 +1120,10 @@ void continueGame1(int size){
             }
         }
     }
+    return 1;
 }
 
-void continueGame2(int size){
+int continueGame2(int size){
     char x=0;
     while(index1!=(size*(size+1))*2){
         if(turn==0){
@@ -1175,7 +1159,7 @@ void continueGame2(int size){
                     else if(ans=='3'){
                         ans2=1;
                         save();
-                        return;
+                        return 0;
                     }
                     else{
                         printf("Invalid Choice\n");
@@ -1283,9 +1267,10 @@ void continueGame2(int size){
             }
         }
     }
+    return 1;
 }
-
-void mode1(int size){
+void menu();
+int mode1(int size){
     char x=0,ans;
     enterplayers1();
     printGrid(x,size);
@@ -1300,7 +1285,7 @@ void mode1(int size){
         printf(" turn\nEnter the letter of the line you want to choose : \n");
         cin>>x;
         if(!valid(x,size) || repeated(x)){
-            moves=-1;
+            moves--;
             continue;
         }
         printGrid(x,size);
@@ -1322,7 +1307,7 @@ void mode1(int size){
                 else if(ans=='3'){
                     ans2=1;
                     save();
-                    return;
+                    return 0;
                 }
                 else{
                     printf("Invalid Choice\n");
@@ -1400,9 +1385,10 @@ void mode1(int size){
             }
         }
     }
+        return 1 ;
 }
 
-void mode2(int size){
+int mode2(int size){
     char x=0;
     enterplayers2();
     printGrid(0,size);
@@ -1440,7 +1426,7 @@ void mode2(int size){
                     else if(ans=='3'){
                         ans2=1;
                         save();
-                        return;
+                        return 0;
                     }
                     else{
                         printf("Invalid Choice\n");
@@ -1548,9 +1534,11 @@ void mode2(int size){
             }
         }
     }
+    return 1;
 }
 
 void newGame(){
+    int x;
     for(int i=0;i<60;i++){
         usedChars[i]=' ';
         turns[i]=0;
@@ -1563,16 +1551,18 @@ void newGame(){
     int mode=choosemode();
     first();
     if(mode==1){
-        mode1(size);
+    x = mode1(size);
     }
     else{
-        mode2(size);
+    x = mode2(size);
     }
+    if ( x==1){
     printscores();
     calculateMoves();
     printmoves();
     printremaininglines(size);
     printwinner();
+}
 }
 
 void menu();
@@ -1672,12 +1662,14 @@ void load(){
     }
     // turn=(turn+1)%2;
     first();
+    int x;
     if(mod2==1){
-        continueGame1(size2);
+    x= continueGame1(size2);
     }
     else{
-        continueGame2(size2);
+    x=continueGame2(size2);
     }
+    if (x==1){
     printscores();
     calculateMoves();
     printmoves();
@@ -1685,6 +1677,7 @@ void load(){
     printwinner();
     // remove(loadedFile);
     // return 0;
+    }
     }
 }
 
