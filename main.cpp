@@ -7,7 +7,7 @@
 #include<unistd.h>
 using namespace std;
 
-int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower,size2,mod2,moves=-1;
+int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower,size2,mod2;
 char usedChars[60];
 int turns[60];
 char boxes[30],boxes2[30];
@@ -310,7 +310,7 @@ void score2(){
 }
 
 
-
+int maxredo=0,moves=-1;
 void printHorizontel(char x,int size){
     for(int j=0;j<size;j++){
                 printf("*");
@@ -584,6 +584,7 @@ void printVertical(char x,int size,int i){
 }
 
 void printGrid(char x,int size){
+    turn=turn%2;
     upper=65,lower=96-size;
     usedChars[index1]=x;
     if(x!=0){
@@ -603,12 +604,6 @@ void printGrid(char x,int size){
     }
     printf("\n");
 }
-
-
-
-
-
-
 
 void printscores(){
     score1();
@@ -861,11 +856,11 @@ void save(){
     }
 }
 
-int maxredo=0;
+
+
 void undo(int size);
 void redo(int size){
     turn++;
-
     printGrid(char(redoarr[moves+1]),size);
     index1++;
     moves++;
@@ -1020,6 +1015,7 @@ void whoIsLast2_1(char c,int size){
                 lastline2=c-def+size;
             }
 }
+
 void whoIsLast2_2(char c,int size){
         int def=32+((c%97)/(size+1));
         if(!choosen(c-1)){
@@ -1063,15 +1059,37 @@ vector<char> dfss(0);
 
 void printDFS(int size){
     int S=dfss.size();
+    int flag=0;
     for(int i=0;i<S;i++){
         if(choosen(dfss[S-1-i])){
             continue;
         }
+        moves++;
+        flag=1;
         printGrid(dfss[S-1-i],size);
         filled();
+        for(int j=0;j<3;j++){
+            if(j==0){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=usedChars[k];
+                }
+            }
+            else if(j==1){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=turns[k];
+                }
+            }
+            else{
+                for(int k=0;k<30;k++){
+                    undoarr[moves+1][j][k]=boxes[k];
+                }
+            }
+        }
         index1++;
+        maxredo++;
     }
 }
+
 void emptydfss(){
     int S=dfss.size();
     for(int i=0;i<S;i++){
@@ -1099,7 +1117,6 @@ void dfs1(char c,int size){
                 }
             }
             else{
-                lastline2=c;
                 dfss.push_back(c);
                 if(usedChars[j]==c){
                     count++;
@@ -1117,19 +1134,17 @@ void dfs1(char c,int size){
         }
     }
     if(count==3){
-        whoIsLast2_1(lastline2,size);
+        whoIsLast2_1(c,size);
         dfss.push_back(lastline2);
-        if(lastline2>=97 && lastline2<=126){
-            dfs1(lastline2,size);
-        }
-        else{
-            if(lastline2==c-def+size){
+            if(lastline2==c+1){
+                dfs1(lastline2,size);
+            }
+            else if(lastline2==c-def+size){
                 dfs3(lastline2,size);
             }
-            else{            
+            else if(lastline2==c-def){        
                 dfs4(lastline2,size);
             }
-        }
     }
     if(count==4){
         printDFS(size);
@@ -1154,7 +1169,6 @@ void dfs2(char c,int size){
                 }
             }
             else{
-                lastline2=c;
                 dfss.push_back(c);
                 if(usedChars[j]==c){
                     count++;
@@ -1172,20 +1186,18 @@ void dfs2(char c,int size){
         }
     }
     if(count==3){
-        whoIsLast2_2(lastline2,size);
+        whoIsLast2_2(c,size);
         dfss.push_back(lastline2);
-        if(lastline2>=97 && lastline2<=126){
-            dfs2(lastline2,size);
-        }
-        else{
-            if(lastline2==c-def+size-1){
+            if(lastline2==c-1){
+                dfs2(lastline2,size);
+            }
+            else if(lastline2==c-def+size-1){
                 dfs3(lastline2,size);
             }
-            else{            
+            else if(lastline2==c-def-1){            
                 dfs4(lastline2,size);
             }
         }
-    }
     if(count==4){
         printDFS(size);
         return;
@@ -1194,20 +1206,13 @@ void dfs2(char c,int size){
 
 
 void dfs3(char c,int size){
-    int def2;
-    if(size==2){
-        def2=1;
-    }
-    else{
-        def2=0;
-    }
-    if(c==65+(size*size)-def2  ||c==65+(size*size)-def2+1  || c==65+(size*size)-def2+2 || c==65+(size*size)-def2+3 || c==65+(size*size)-def2+4){
+    if(c==65+(size*size)  ||c==65+(size*size)+1  || c==65+(size*size)+2 || c==65+(size*size)+3 || c==65+(size*size)+4){
         return;
     }
     int count=0;
     int flag=1;
     int def=32+(c%65)/size;
-    if(c!=65+(size*size)-def2 &&c!=65+(size*size)-def2+1 && c!=65+(size*size)-def2+2&& c!=65+(size*size)-def2+3&& c!=65+(size*size)-def2+4){
+    if(c!=65+(size*size) &&c!=65+(size*size)+1 && c!=65+(size*size)+2&& c!=65+(size*size)+3&& c!=65+(size*size)+4){
         for(int j=0;j<60;j++){
             if(dfss.size()>0){
                 if(dfss[dfss.size()-1]==c && flag==1){
@@ -1216,7 +1221,6 @@ void dfs3(char c,int size){
                 }
             }
             else{
-                lastline2=c;
                 dfss.push_back(c);
                 if(usedChars[j]==c){
                     count++;
@@ -1234,26 +1238,23 @@ void dfs3(char c,int size){
         }
     }
     if(count==3){
-        whoIsLast2_3(lastline2,size);
+        whoIsLast2_3(c,size);
         dfss.push_back(lastline2);
-        if(lastline2>=97 && lastline2<=126){
             if(lastline2==c+def+1){
                 dfs1(lastline2,size);
             }
-            else{
+            else if(lastline2==c+def) {
                 dfs2(lastline2,size);
             }
-        }
-        else{
-            dfs3(lastline2,size);
-        }
+            else if(lastline2==c+size){
+                dfs3(lastline2,size);
+            }
     }
     if(count==4){
         printDFS(size);
         return;
     }
 }
-
 
 void dfs4(char c,int size){
     if(size==2){
@@ -1279,7 +1280,6 @@ void dfs4(char c,int size){
                     }
                 }
                 else{
-                    lastline2=c;
                     dfss.push_back(c);
                     if(usedChars[j]==c){
                         count++;
@@ -1307,7 +1307,6 @@ void dfs4(char c,int size){
                     }
                 }
                 else{
-                    lastline2=c;
                     dfss.push_back(c);
                     if(usedChars[j]==c){
                         count++;
@@ -1326,19 +1325,17 @@ void dfs4(char c,int size){
         }
     }
     if(count==3){
-        whoIsLast2_4(lastline2,size);
+        whoIsLast2_4(c,size);
         dfss.push_back(lastline2);
-        if(lastline2>=97 && lastline2<=126){
             if(lastline2==c-size+def){
                 dfs1(lastline2,size);
             }
-            else{
+            else if(lastline2==c-size-1+def){
                 dfs2(lastline2,size);
             }
-        }
-        else{
+            else if(lastline2==c-size){
             dfs4(lastline2,size);
-        }
+            }
     }
     if(count==4){
         printDFS(size);
@@ -1362,7 +1359,7 @@ int continueGame1(int size){
         printf(" turn\nEnter the letter of the line you want to choose : \n");
         cin>>x;
         if(!valid(x,size) || repeated(x)){
-            moves=-1;
+            moves--;
             continue;
         }
         printGrid(x,size);
@@ -1412,7 +1409,7 @@ int continueGame1(int size){
         if(!filled()){
             maxredo=0;
             turn=(turn+1)%2;
-            moves--;
+            moves=-1;
             for(int i=0;i<25;i++){
                 redoarr[i]=0;
             }
@@ -1443,23 +1440,6 @@ int continueGame1(int size){
         }
         else{
             maxredo++;
-            for(int j=0;j<3;j++){
-                if(j==0){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=usedChars[k];
-                    }
-                }
-                else if(j==1){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=turns[k];
-                    }
-                }
-                else{
-                    for(int k=0;k<30;k++){
-                        undoarr[moves+1][j][k]=boxes[k];
-                    }
-                }
-            }
             emptydfss();
             if(x>=97&&x<=126){
                 dfs1(x,size);
@@ -1538,6 +1518,7 @@ int continueGame2(int size){
             }
             index1++; 
             if(!filled()){
+                maxredo=0;
                 turn=(turn+1)%2;
                 moves=-1;
                 for(int i=0;i<25;i++){
@@ -1569,23 +1550,7 @@ int continueGame2(int size){
                 }
             }
             else{
-                for(int j=0;j<3;j++){
-                    if(j==0){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=usedChars[k];
-                        }
-                    }
-                    else if(j==1){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=turns[k];
-                        }
-                    }
-                    else{
-                        for(int k=0;k<30;k++){
-                            undoarr[moves+1][j][k]=boxes[k];
-                        }
-                    }
-                }
+                maxredo++;
                 emptydfss();
                 if(x>=97&&x<=126){
                     dfs1(x,size);
@@ -1660,29 +1625,13 @@ int continueGame2(int size){
             }
             else{
                 maxredo++;
-                for(int j=0;j<3;j++){
-                    if(j==0){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=usedChars[k];
-                        }
-                    }
-                    else if(j==1){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=turns[k];
-                        }
-                    }
-                    else{
-                        for(int k=0;k<30;k++){
-                            undoarr[moves+1][j][k]=boxes[k];
-                        }
-                    }
-                }
             }
         }
     }
         return 1 ;
 }
-void menu();
+
+
 int mode1(int size){
     char x=0,ans;
     enterplayers1();
@@ -1779,23 +1728,6 @@ int mode1(int size){
         }
         else{
             maxredo++;
-            for(int j=0;j<3;j++){
-                if(j==0){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=usedChars[k];
-                    }
-                }
-                else if(j==1){
-                    for(int k=0;k<60;k++){
-                        undoarr[moves+1][j][k]=turns[k];
-                    }
-                }
-                else{
-                    for(int k=0;k<30;k++){
-                        undoarr[moves+1][j][k]=boxes[k];
-                    }
-                }
-            }
             emptydfss();
             if(x>=97&&x<=126){
                 dfs1(x,size);
@@ -1909,23 +1841,6 @@ int mode2(int size){
             }
             else{
                 maxredo++;
-                for(int j=0;j<3;j++){
-                    if(j==0){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=usedChars[k];
-                        }
-                    }
-                    else if(j==1){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=turns[k];
-                        }
-                    }
-                    else{
-                        for(int k=0;k<30;k++){
-                            undoarr[moves+1][j][k]=boxes[k];
-                        }
-                    }
-                }
                 emptydfss();
                 if(x>=97&&x<=126){
                     dfs1(x,size);
@@ -2000,28 +1915,12 @@ int mode2(int size){
             }
             else{
                 maxredo++;
-                for(int j=0;j<3;j++){
-                    if(j==0){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=usedChars[k];
-                        }
-                    }
-                    else if(j==1){
-                        for(int k=0;k<60;k++){
-                            undoarr[moves+1][j][k]=turns[k];
-                        }
-                    }
-                    else{
-                        for(int k=0;k<30;k++){
-                            undoarr[moves+1][j][k]=boxes[k];
-                        }
-                    }
-                }
             }
         }
     }
         return 1 ;
 }
+
 
 void newGame(){
     int x;
