@@ -604,393 +604,7 @@ void printGrid(char x,int size){
     printf("\n");
 }
 
-char lastline2=' ';
-void whoIsLast2(char c,int def,int size){
-    if(choosen(c)){
-        if(choosen(c+1)){
-            if(choosen(c-def)){
-                lastline2=c-def+size;
-            }
-            else{
-                lastline2=c-def;
-            }
-        }
-        else{
-            lastline2=c+1;
-        }
-    }
-    else{
-        lastline2=c;
-    }
-}
-int xx=0;
-int dfs1_2(char c,int size){
-    if(c==97+size ||c==97+(2*size)+1 || c==97+(3*size)+2 || c==97+(4*size)+3 || c==97+(5*size)+4){
-        return xx;
-    }
-    lastline2=' ';
-    int count=0;
-    int i=c-97;
-    int def=32+((c%97)/(size+1));
-    if(c>=97 && c<=126 && c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
-        for(int j=0;j<60;j++){
-            if(usedChars[j]==c){
-                count++;
-            }
-            if(usedChars[j]==c+1){
-                count++;
-            }
-            if(usedChars[j]==c-def){
-                count++;
-            }
-            if(usedChars[j]==c-def+size){
-                count++;
-            }
-        }
-    }
-    if(count==2 && c+1!=97+size &&c+1!=97+(2*size)+1 && c+1!=97+(3*size)+2 && c+1!=97+(4*size)+3 && c+1!=97+(5*size)+4){
-        xx++;
-        return dfs1_2(c+1,size);
-    }
-    else if(count==3){
-        return xx+1;
-    }
-    else{
-        return 0;
-    }
-}
 
-void dfs1(char c,int size){
-    xx=0;
-    if(c==97+size ||c==97+(2*size)+1 || c==97+(3*size)+2 || c==97+(4*size)+3 || c==97+(5*size)+4){
-        return;
-    }
-    lastline2=' ';
-    int count=0;
-    int i=c-97;
-    int def=32+((c%97)/(size+1));
-    if(c>=97 && c<=126 && c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
-        for(int j=0;j<60;j++){
-            if(usedChars[j]==c){
-                count++;
-            }
-            if(usedChars[j]==c+1){
-                count++;
-            }
-            if(usedChars[j]==c-def){
-                count++;
-            }
-            if(usedChars[j]==c-def+size){
-                count++;
-            }
-        }
-    }
-        char b=c;
-    if(count==3){
-        whoIsLast2(c,def,size);
-        int q=dfs1_2(c+1,size);
-            for(int i=0;i<q;i++){
-                b++;
-                printGrid(b,size);
-                filled();
-                index1++;
-            }
-    }
-} 
-
-
-
-int dfs2_2(char c,int size){
-    if(c==97||c==97+(1*size)+1 || c==97+(2*size)+2 || c==97+(3*size)+3 || c==97+(4*size)+4){
-        return xx;
-    }
-    lastline2=' ';
-    int count=0;
-    int def=32+((c%97)/(size+1));
-    if(c>=97 && c<=126 && c!=97 && c!=97+(1*size)+1 && c!=97+(2*size)+2 && c!=97+(3*size)+3 && c!=97+(4*size)+4){
-        for(int j=0;j<60;j++){
-            if(usedChars[j]==c){
-                count++;
-            }
-            if(usedChars[j]==c-1){
-                count++;
-            }
-            if(usedChars[j]==c-def-1){
-                count++;
-            }
-            if(usedChars[j]==c-def+size-1){
-                count++;
-            }
-        }
-    }
-    if(count==2 && c-1!=97 && c-1!=97+(1*size)+1 && c-1!=97+(2*size)+2 && c-1!=97+(3*size)+3 && c-1!=97+(4*size)+4){
-        xx++;
-        return dfs2_2(c-1,size);
-    }
-    else if(count==3){
-        return xx+1;
-    }
-    else{
-        return 0;
-    }
-}
-
-void dfs2(char c,int size){
-    xx=0;
-    if(c==97 ||c==97+(1*size)+1 || c==97+(2*size)+2 || c==97+(3*size)+3 || c==97+(4*size)+4){
-        return;
-    }
-    lastline2=' ';
-    int count=0;
-    int def=32+((c%97)/(size+1));
-    if(c>=97 && c<=126 && c!=97 &&c!=97+(1*size)+1 && c!=97+(2*size)+2 && c!=97+(3*size)+3 && c!=97+(4*size)+4){
-        for(int j=0;j<60;j++){
-            if(usedChars[j]==c){
-                count++;
-            }
-            if(usedChars[j]==c-1){
-                count++;
-            }
-            if(usedChars[j]==c-def-1){
-                count++;
-            }
-            if(usedChars[j]==c-def+size-1){
-                count++;
-            }
-        }
-    }
-        char b=c;
-    if(count==3){
-        int q=dfs2_2(c-1,size);
-            for(int i=0;i<q;i++){
-                b--;
-                printGrid(b,size);
-                filled();
-                index1++;
-            }
-    }
-} 
-
-
-
-int dfs3_2(char c,int size,int def2){
-    if(c==65+(size*size)-def2  ||c==65+(size*size)-def2+1  || c==65+(size*size)-def2+2 || c==65+(size*size)-def2+3 || c==65+(size*size)-def2+4){
-        return xx;
-    }
-    lastline2=' ';
-    int count=0;
-    int def=32+(c%65)/size;
-    if(c>=65 && c<=94 && c!=65+(size*size)-def2 &&c!=65+(size*size)-def2+1 && c!=65+(size*size)-def2+2&& c!=65+(size*size)-def2+3&& c!=65+(size*size)-def2+4){
-        for(int j=0;j<60;j++){
-            if(usedChars[j]==c){
-                count++;
-            }
-            if(usedChars[j]==c+size){
-                count++;
-            }
-            if(usedChars[j]==c+def){
-                count++;
-            }
-            if(usedChars[j]==c+def+1){
-                count++;
-            }
-        }
-    }
-    if(count==2 && c+size!=65+(size*size)-def2 &&c+size!=65+(size*size)-def2+1 && c+size!=65+(size*size)-def2+2&& c+size!=65+(size*size)-def2+3&& c+size!=65+(size*size)-def2+4){
-        xx++;
-        return dfs3_2(c+size,size,def2);
-    }
-    else if(count==3){
-        return xx+1;
-    }
-    else{
-        return 0;
-    }
-}
-
-void dfs3(char c,int size){
-    int def2;
-    if(size==2){
-        def2=1;
-    }
-    else{
-        def2=0;
-    }
-    xx=0;
-    if(c==65+(size*size)-def2  ||c==65+(size*size)-def2+1  || c==65+(size*size)-def2+2 || c==65+(size*size)-def2+3 || c==65+(size*size)-def2+4){
-        return;
-    }
-    lastline2=' ';
-    int count=0;
-    int def=32+(c%65)/size;
-    if(c>=65 && c<=94 && c!=65+(size*size)-def2 &&c!=65+(size*size)-def2+1 && c!=65+(size*size)-def2+2&& c!=65+(size*size)-def2+3&& c!=65+(size*size)-def2+4){
-        for(int j=0;j<60;j++){
-            if(usedChars[j]==c){
-                count++;
-            }
-            if(usedChars[j]==c+size){
-                count++;
-            }
-            if(usedChars[j]==c+def){
-                count++;
-            }
-            if(usedChars[j]==c+def+1){
-                count++;
-            }
-        }
-    }
-        char b=c;
-    if(count==3){
-        int q=dfs3_2(c+size,size,def2);
-            for(int i=0;i<q;i++){
-                b+=size;
-                printGrid(b,size);
-                filled();
-                index1++;
-            }
-    }
-} 
-
-
-
-int dfs4_2(char c,int size){
-    if(size==2){
-        if(c==65 ||c==66){
-            return xx;
-        }
-    }
-    else{
-        if(c==65 ||c==66||c==67||c==68||c==69){
-            return xx;
-        }
-    }
-    lastline2=' ';
-    int count=0;
-    int def=32+(c%65)/size;
-    if(size==5){
-        if(c>=65 && c<=94 && c!=65 && c!=66 && c!=67 && c!=68 && c!=69){
-            for(int j=0;j<60;j++){
-                if(usedChars[j]==c){
-                    count++;
-                }
-                if(usedChars[j]==c-size){
-                    count++;
-                }
-                if(usedChars[j]==c-size-1+def){
-                    count++;
-                }
-                if(usedChars[j]==c-size+def){
-                    count++;
-                }
-            }
-        }
-    }
-    else{
-            if(c>=65 && c<=94 && c!=65 && c!=66){
-            for(int j=0;j<60;j++){
-                if(usedChars[j]==c){
-                    count++;
-                }
-                if(usedChars[j]==c-size){
-                    count++;
-                }
-                if(usedChars[j]==c-size-1+def){
-                    count++;
-                }
-                if(usedChars[j]==c-size+def){
-                    count++;
-                }
-            }
-        }
-    }
-    if(size==5){
-        if(count==2 && c-size!=65 && c-size!=66 && c-size!=67 && c-size!=68 && c-size!=69){
-            xx++;
-            return dfs4_2(c-size,size);
-        }
-        else if(count==3){
-            return xx+1;
-        }
-        else{
-            return 0;
-        }
-    }
-    else{
-        if(count==2 && c-size!=65 && c-size!=66){
-            xx++;
-            return dfs4_2(c-size,size);
-        }
-        else if(count==3){
-            return xx+1;
-        }
-        else{
-            return 0;
-        }
-    }
-}
-
-void dfs4(char c,int size){
-    xx=0;
-    if(size==2){
-        if(c==65 ||c==66){
-            return;
-        }
-    }
-    else{
-        if(c==65 ||c==66||c==67||c==68||c==69){
-            return;
-        }
-    }
-    lastline2=' ';
-    int count=0;
-    int def=32+(c%65)/size;
-    if(size==5){
-        if(c>=65 && c<=94 && c!=65 && c!=66 && c!=67 && c!=68 && c!=69){
-            for(int j=0;j<60;j++){
-                if(usedChars[j]==c){
-                    count++;
-                }
-                if(usedChars[j]==c-size){
-                    count++;
-                }
-                if(usedChars[j]==c-size-1+def){
-                    count++;
-                }
-                if(usedChars[j]==c-size+def){
-                    count++;
-                }
-            }
-        }
-    }
-    else{
-        if(c>=65 && c<=94 && c!=65 && c!=66){
-            for(int j=0;j<60;j++){
-                if(usedChars[j]==c){
-                    count++;
-                }
-                if(usedChars[j]==c-size){
-                    count++;
-                }
-                if(usedChars[j]==c-size-1+def){
-                    count++;
-                }
-                if(usedChars[j]==c-size+def){
-                    count++;
-                }
-            }
-        }
-    }
-    char b=c;
-    if(count==3){
-        int q=dfs4_2(c-size,size);
-            for(int i=0;i<q;i++){
-                b-=size;
-                printGrid(b,size);
-                filled();
-                index1++;
-            }
-    }
-} 
 
 
 
@@ -1392,6 +1006,348 @@ void first(){
             }
 }
 
+
+char lastline2=' ';
+void whoIsLast2_1(char c,int size){
+        int def=32+((c%97)/(size+1));
+        if(!choosen(c+1)){
+            lastline2=c+1;
+        }
+        else if(!choosen(c-def)){
+                lastline2=c-def;
+            }
+        else if(!choosen(c-def+size)){
+                lastline2=c-def+size;
+            }
+}
+void whoIsLast2_2(char c,int size){
+        int def=32+((c%97)/(size+1));
+        if(!choosen(c-1)){
+            lastline2=c-1;
+        }
+        else if(!choosen(c-def-1)){
+                lastline2=c-def-1;
+            }
+        else if(!choosen(c-def+size-1)){
+                lastline2=c-def+size-1;
+            }
+}
+
+void whoIsLast2_3(char c,int size){
+    int def=32+(c%65)/size;
+        if(!choosen(c+size)){
+            lastline2=c+size;
+        }
+        else if(!choosen(c+def)){
+                lastline2=c+def;
+            }
+        else if(!choosen(c+def+1)){
+                lastline2=c+def+1;
+            }
+}
+
+void whoIsLast2_4(char c,int size){
+    int def=32+(c%65)/size;
+        if(!choosen(c-size)){
+            lastline2=c-size;
+        }
+        else if(!choosen(c-size-1+def)){
+                lastline2=c-size-1+def;
+            }
+        else if(!choosen(c-size+def)){
+                lastline2=c-size+def;
+            }
+}
+
+vector<char> dfss(0);
+
+void printDFS(int size){
+    int S=dfss.size();
+    for(int i=0;i<S;i++){
+        if(choosen(dfss[S-1-i])){
+            continue;
+        }
+        printGrid(dfss[S-1-i],size);
+        filled();
+        index1++;
+    }
+}
+void emptydfss(){
+    int S=dfss.size();
+    for(int i=0;i<S;i++){
+        dfss.pop_back();
+    }
+}
+
+void dfs2(char c,int size);
+void dfs3(char c,int size);
+void dfs4(char c,int size);
+
+void dfs1(char c,int size){
+    if(c==97+size ||c==97+(2*size)+1 || c==97+(3*size)+2 || c==97+(4*size)+3 || c==97+(5*size)+4){
+        return;
+    }
+    int count=0;
+    int def=32+((c%97)/(size+1));
+    int flag=1;
+    if(c!=97+size &&c!=97+(2*size)+1 && c!=97+(3*size)+2 && c!=97+(4*size)+3 && c!=97+(5*size)+4){
+        for(int j=0;j<60;j++){
+            if(dfss.size()>0){
+                if(dfss[dfss.size()-1]==c && flag==1){
+                    count++;
+                    flag=0;
+                }
+            }
+            else{
+                lastline2=c;
+                dfss.push_back(c);
+                if(usedChars[j]==c){
+                    count++;
+                }
+            }
+            if(usedChars[j]==c+1){
+                count++;
+            }
+            if(usedChars[j]==c-def){
+                count++;
+            }
+            if(usedChars[j]==c-def+size){
+                count++;
+            }
+        }
+    }
+    if(count==3){
+        whoIsLast2_1(lastline2,size);
+        dfss.push_back(lastline2);
+        if(lastline2>=97 && lastline2<=126){
+            dfs1(lastline2,size);
+        }
+        else{
+            if(lastline2==c-def+size){
+                dfs3(lastline2,size);
+            }
+            else{            
+                dfs4(lastline2,size);
+            }
+        }
+    }
+    if(count==4){
+        printDFS(size);
+        return;
+    }
+} 
+
+
+void dfs2(char c,int size){
+    if(c==97 ||c==97+(1*size)+1 || c==97+(2*size)+2 || c==97+(3*size)+3 || c==97+(4*size)+4){
+        return;
+    }
+    int count=0;
+    int def=32+((c%97)/(size+1));
+    int flag=1;
+    if(c!=97 &&c!=97+(1*size)+1 && c!=97+(2*size)+2 && c!=97+(3*size)+3 && c!=97+(4*size)+4){
+        for(int j=0;j<60;j++){
+            if(dfss.size()>0){
+                if(dfss[dfss.size()-1]==c && flag==1){
+                    count++;
+                    flag=0;
+                }
+            }
+            else{
+                lastline2=c;
+                dfss.push_back(c);
+                if(usedChars[j]==c){
+                    count++;
+                }
+            }
+            if(usedChars[j]==c-1){
+                count++;
+            }
+            if(usedChars[j]==c-def-1){
+                count++;
+            }
+            if(usedChars[j]==c-def+size-1){
+                count++;
+            }
+        }
+    }
+    if(count==3){
+        whoIsLast2_2(lastline2,size);
+        dfss.push_back(lastline2);
+        if(lastline2>=97 && lastline2<=126){
+            dfs2(lastline2,size);
+        }
+        else{
+            if(lastline2==c-def+size-1){
+                dfs3(lastline2,size);
+            }
+            else{            
+                dfs4(lastline2,size);
+            }
+        }
+    }
+    if(count==4){
+        printDFS(size);
+        return;
+    }
+} 
+
+
+void dfs3(char c,int size){
+    int def2;
+    if(size==2){
+        def2=1;
+    }
+    else{
+        def2=0;
+    }
+    if(c==65+(size*size)-def2  ||c==65+(size*size)-def2+1  || c==65+(size*size)-def2+2 || c==65+(size*size)-def2+3 || c==65+(size*size)-def2+4){
+        return;
+    }
+    int count=0;
+    int flag=1;
+    int def=32+(c%65)/size;
+    if(c!=65+(size*size)-def2 &&c!=65+(size*size)-def2+1 && c!=65+(size*size)-def2+2&& c!=65+(size*size)-def2+3&& c!=65+(size*size)-def2+4){
+        for(int j=0;j<60;j++){
+            if(dfss.size()>0){
+                if(dfss[dfss.size()-1]==c && flag==1){
+                    count++;
+                    flag=0;
+                }
+            }
+            else{
+                lastline2=c;
+                dfss.push_back(c);
+                if(usedChars[j]==c){
+                    count++;
+                }
+            }
+            if(usedChars[j]==c+size){
+                count++;
+            }
+            if(usedChars[j]==c+def){
+                count++;
+            }
+            if(usedChars[j]==c+def+1){
+                count++;
+            }
+        }
+    }
+    if(count==3){
+        whoIsLast2_3(lastline2,size);
+        dfss.push_back(lastline2);
+        if(lastline2>=97 && lastline2<=126){
+            if(lastline2==c+def+1){
+                dfs1(lastline2,size);
+            }
+            else{
+                dfs2(lastline2,size);
+            }
+        }
+        else{
+            dfs3(lastline2,size);
+        }
+    }
+    if(count==4){
+        printDFS(size);
+        return;
+    }
+}
+
+
+void dfs4(char c,int size){
+    if(size==2){
+        if(c==65 ||c==66){
+            return;
+        }
+    }
+    else{
+        if(c==65 ||c==66||c==67||c==68||c==69){
+            return;
+        }
+    }
+    int count=0;
+    int def=32+(c%65)/size;
+    int flag=1;
+    if(size==5){
+        if(c!=65 && c!=66 && c!=67 && c!=68 && c!=69){
+            for(int j=0;j<60;j++){
+                if(dfss.size()>0){
+                    if(dfss[dfss.size()-1]==c && flag==1){
+                        count++;
+                        flag=0;
+                    }
+                }
+                else{
+                    lastline2=c;
+                    dfss.push_back(c);
+                    if(usedChars[j]==c){
+                        count++;
+                    }
+                }
+                if(usedChars[j]==c-size){
+                    count++;
+                }
+                if(usedChars[j]==c-size-1+def){
+                    count++;
+                }
+                if(usedChars[j]==c-size+def){
+                    count++;
+                }
+            }
+        }
+    }
+    else{
+        if(c!=65 && c!=66){
+            for(int j=0;j<60;j++){
+                if(dfss.size()>0){
+                    if(dfss[dfss.size()-1]==c && flag==1){
+                        count++;
+                        flag=0;
+                    }
+                }
+                else{
+                    lastline2=c;
+                    dfss.push_back(c);
+                    if(usedChars[j]==c){
+                        count++;
+                    }
+                }
+                if(usedChars[j]==c-size){
+                    count++;
+                }
+                if(usedChars[j]==c-size-1+def){
+                    count++;
+                }
+                if(usedChars[j]==c-size+def){
+                    count++;
+                }
+            }
+        }
+    }
+    if(count==3){
+        whoIsLast2_4(lastline2,size);
+        dfss.push_back(lastline2);
+        if(lastline2>=97 && lastline2<=126){
+            if(lastline2==c-size+def){
+                dfs1(lastline2,size);
+            }
+            else{
+                dfs2(lastline2,size);
+            }
+        }
+        else{
+            dfs4(lastline2,size);
+        }
+    }
+    if(count==4){
+        printDFS(size);
+        return;
+    }
+} 
+
+
+
 int continueGame1(int size){
     char x=0,ans;
     printGrid(x,size);
@@ -1503,6 +1459,17 @@ int continueGame1(int size){
                         undoarr[moves+1][j][k]=boxes[k];
                     }
                 }
+            }
+            emptydfss();
+            if(x>=97&&x<=126){
+                dfs1(x,size);
+                emptydfss();
+                dfs2(x,size);
+            }
+            else{
+                dfs3(x,size);
+                emptydfss();
+                dfs4(x,size);
             }
         }
     }
@@ -1619,6 +1586,17 @@ int continueGame2(int size){
                         }
                     }
                 }
+                emptydfss();
+                if(x>=97&&x<=126){
+                    dfs1(x,size);
+                    emptydfss();
+                    dfs2(x,size);
+                }
+                else{
+                    dfs3(x,size);
+                    emptydfss();
+                    dfs4(x,size);
+                }
             }
         }
         else{
@@ -1649,11 +1627,60 @@ int continueGame2(int size){
             printGrid(x,size);
             index1++; 
             if(!filled()){
+                maxredo=0;
                 turn=(turn+1)%2;
+                moves=-1;
+                for(int i=0;i<25;i++){
+                    redoarr[i]=0;
+                }
+                for(int i=0;i<25;i++){
+                    for(int j=0;j<3;j++){
+                        for(int k=0;k<60;k++){
+                            undoarr[i][j][k]=0;
+                        }
+                    }
+                }
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[0][j][k]=boxes[k];
+                        }
+                    }
+                }
+            }
+            else{
+                maxredo++;
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[moves+1][j][k]=boxes[k];
+                        }
+                    }
+                }
             }
         }
     }
-    return 1;
+        return 1 ;
 }
 void menu();
 int mode1(int size){
@@ -1675,48 +1702,48 @@ int mode1(int size){
             continue;
         }
         printGrid(x,size);
-        // if(index1+1!=(size*(size+1))*2){
-        //     char ans;
-        //     char ans2=0;
-        //     while(ans2==0){
-        //         cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
-        //         cin>>ans;
-        //         if(ans=='1'){
-        //             ans2=1;
-        //             index1++;
-        //             undo(size);
-        //             index1--;
-        //         }
-        //         else if(ans=='2'){
-        //             ans2=1;
-        //         }
-        //         else if(ans=='3'){
-        //             ans2=1;
-        //             save();
-        //             return 0;
-        //         }
-        //         else{
-        //             printf("Invalid Choice\n");
-        //         }
-        //     }
-        // }
-        // for(int j=0;j<3;j++){
-        //     if(j==0){
-        //         for(int k=0;k<60;k++){
-        //             undoarr[moves+1][j][k]=usedChars[k];
-        //         }
-        //     }
-        //     else if(j==1){
-        //         for(int k=0;k<60;k++){
-        //             undoarr[moves+1][j][k]=turns[k];
-        //         }
-        //     }
-        //     else{
-        //         for(int k=0;k<30;k++){
-        //             undoarr[moves+1][j][k]=boxes[k];
-        //         }
-        //     }
-        // }
+        if(index1+1!=(size*(size+1))*2){
+            char ans;
+            char ans2=0;
+            while(ans2==0){
+                cout<<"Press\n1-undo\n2-continue\n3-save&quit\n";
+                cin>>ans;
+                if(ans=='1'){
+                    ans2=1;
+                    index1++;
+                    undo(size);
+                    index1--;
+                }
+                else if(ans=='2'){
+                    ans2=1;
+                }
+                else if(ans=='3'){
+                    ans2=1;
+                    save();
+                    return 0;
+                }
+                else{
+                    printf("Invalid Choice\n");
+                }
+            }
+        }
+        for(int j=0;j<3;j++){
+            if(j==0){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=usedChars[k];
+                }
+            }
+            else if(j==1){
+                for(int k=0;k<60;k++){
+                    undoarr[moves+1][j][k]=turns[k];
+                }
+            }
+            else{
+                for(int k=0;k<30;k++){
+                    undoarr[moves+1][j][k]=boxes[k];
+                }
+            }
+        }
         index1++; 
         if(!filled()){
             maxredo=0;
@@ -1769,12 +1796,15 @@ int mode1(int size){
                     }
                 }
             }
+            emptydfss();
             if(x>=97&&x<=126){
                 dfs1(x,size);
+                emptydfss();
                 dfs2(x,size);
             }
             else{
                 dfs3(x,size);
+                emptydfss();
                 dfs4(x,size);
             }
         }
@@ -1846,6 +1876,7 @@ int mode2(int size){
             }
             index1++; 
             if(!filled()){
+                maxredo=0;
                 turn=(turn+1)%2;
                 moves=-1;
                 for(int i=0;i<25;i++){
@@ -1877,6 +1908,7 @@ int mode2(int size){
                 }
             }
             else{
+                maxredo++;
                 for(int j=0;j<3;j++){
                     if(j==0){
                         for(int k=0;k<60;k++){
@@ -1893,6 +1925,17 @@ int mode2(int size){
                             undoarr[moves+1][j][k]=boxes[k];
                         }
                     }
+                }
+                emptydfss();
+                if(x>=97&&x<=126){
+                    dfs1(x,size);
+                    emptydfss();
+                    dfs2(x,size);
+                }
+                else{
+                    dfs3(x,size);
+                    emptydfss();
+                    dfs4(x,size);
                 }
             }
         }
@@ -1924,11 +1967,60 @@ int mode2(int size){
             printGrid(x,size);
             index1++; 
             if(!filled()){
+                maxredo=0;
                 turn=(turn+1)%2;
+                moves=-1;
+                for(int i=0;i<25;i++){
+                    redoarr[i]=0;
+                }
+                for(int i=0;i<25;i++){
+                    for(int j=0;j<3;j++){
+                        for(int k=0;k<60;k++){
+                            undoarr[i][j][k]=0;
+                        }
+                    }
+                }
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[0][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[0][j][k]=boxes[k];
+                        }
+                    }
+                }
+            }
+            else{
+                maxredo++;
+                for(int j=0;j<3;j++){
+                    if(j==0){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=usedChars[k];
+                        }
+                    }
+                    else if(j==1){
+                        for(int k=0;k<60;k++){
+                            undoarr[moves+1][j][k]=turns[k];
+                        }
+                    }
+                    else{
+                        for(int k=0;k<30;k++){
+                            undoarr[moves+1][j][k]=boxes[k];
+                        }
+                    }
+                }
             }
         }
     }
-    return 1;
+        return 1 ;
 }
 
 void newGame(){
