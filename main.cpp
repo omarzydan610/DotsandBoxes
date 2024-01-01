@@ -1,26 +1,27 @@
 #include<stdio.h>
 #include<iostream>
-#include<time.h>
-#include"ANSI-color-codes.h"
-#include<vector>
 #include<string.h>
+#include<vector>
+#include"ANSI-color-codes.h"
+#include<time.h>
 #include<unistd.h>
 using namespace std;
 
 int index1,turn,NoMoves1=0,NoMoves2=0,upper,lower,size2,mod2;
-char usedChars[60];
-int turns[60];
-char boxes[30],boxes2[30];
-int undoarr[25][3][60]={0};
-int redoarr[25]={0};
-typedef struct{
+char usedChars[60];  //stores choosen characters.
+int turns[60];   //stores who chose each character in (usedChars) array.
+char boxes[30],boxes2[30]; //stores the number of player who close each box.
+int undoarr[25][3][60]={0};  //take a snapshot of last played move and it is used in (undo) function.
+int redoarr[25]={0};  //stores the last undo char and is used in (redo) function.
+
+typedef struct{  //stores players information
     char name[100];
     int color;
     int score=0;
 }player;
 player p1,p2;
 
-int chooseLevel(){
+int chooseLevel(){ //determines the size of the grid (5*5 or 2*2)
     char ans;
     printf("Choose your level\n1-Biginer\n2-Expert\n");
     cin>>ans;
@@ -38,7 +39,7 @@ int chooseLevel(){
     }
 }
 
-int choosemode(){
+int choosemode(){  //determines the mode one VS one or human VS computer.
     char ans;
     printf("Choose Mode\n1-1 VS 1\n2-Player VS Computer\n");
     cin>>ans;
@@ -56,7 +57,7 @@ int choosemode(){
     }
 }
 
-void enterplayers1(){
+void enterplayers1(){  //used to enter players data when mode is 1.
     printf("Enter player1 name : ");
     cin>>p1.name;
     cout<<"Hi "<<p1.name<<" ";
@@ -95,7 +96,7 @@ void enterplayers1(){
     }
 }
 
-void enterplayers2(){
+void enterplayers2(){  //used to enter player data when mode is 2.
     printf("Enter your name : ");
     cin>>p1.name;
     cout<<"Hi "<<p1.name<<" ";
@@ -118,7 +119,7 @@ void enterplayers2(){
 }
 
 
-int choosen(char a){
+int choosen(char a){  //determines if the character is already choosen or not.
     for(int i=0;i<=60;i++){
         if(a==usedChars[i]){
             return turns[i];
@@ -127,7 +128,7 @@ int choosen(char a){
     return 0;
 }
 
-void printPlayer(){
+void printPlayer(){  //It prints the player's name with his color.
     if(turn==0 && p1.color==1){
         cout<<BRED<<p1.name<<reset;
     }
@@ -155,7 +156,7 @@ void printPlayer(){
 }
 
 char lastline=' ';
-void whoIsLast(char c,int def,int size){
+void whoIsLast(char c,int def,int size){  //determine if there is a closed box and store who closed it ,Used in computer logic.
     if(choosen(c)){
         if(choosen(c+1)){
             if(choosen(c-def)){
@@ -174,7 +175,7 @@ void whoIsLast(char c,int def,int size){
     }
 }
 
-void computerLogic(char c,int size){
+void computerLogic(char c,int size){  //playing for computer.
     lastline=' ';
     int count=0;
     int i=c-97;
@@ -200,7 +201,9 @@ void computerLogic(char c,int size){
     }
 }
 
-int isBox1(char c,int size){
+
+// The next two function work together to determine if there is a closed box  or not and store who closed it
+int isBox1(char c,int size){  
     lastline=' ';
     int count=0;
     int i=c-97;
@@ -246,7 +249,8 @@ void isBox2(char c,int size){
     
 }
 
-bool valid(char x,int size){
+
+bool valid(char x,int size){  //returns if the choosen character is valid or not.
     if(size==5){
         if((x>=65&&x<=94)||(x>=97&&x<=126)){
             return 1;
@@ -267,7 +271,7 @@ bool valid(char x,int size){
     }
 }
 
-bool repeated(char x){
+bool repeated(char x){  //returns if the character is choosen before or not.
     for(int i=0;i<=60;i++){
         if(usedChars[i]==x){
             printf("Already taken\n");
@@ -277,7 +281,7 @@ bool repeated(char x){
     return 0;
 }
 
-bool filled(){
+bool filled(){  // checks if the player closed a box or not.
     for(int i=0;i<30;i++){
         if(boxes[i]!=boxes2[i]){
             for(int j=0;j<30;j++){
@@ -289,7 +293,7 @@ bool filled(){
     return 0;
 }
 
-void score1(){
+void score1(){  //calculate the score of player1.
     int counter1=0;
     for(int i=0;i<30;i++){
         if(boxes[i]=='1'){
@@ -299,7 +303,7 @@ void score1(){
     p1.score=counter1;
 }
 
-void score2(){
+void score2(){  //calculate the score of player2.
     int counter2=0;
     for(int i=0;i<30;i++){
         if(boxes[i]=='2'){
@@ -309,9 +313,8 @@ void score2(){
     p2.score=counter2;
 }
 
-
-int maxredo=0,moves=-1;
-void printHorizontel(char x,int size){
+// The next four functions print the grid. 
+void printHorizontel(char x,int size){  //prints horizontal line in the grid.
     for(int j=0;j<size;j++){
                 printf("*");
                 if(choosen(upper)==1){
@@ -352,7 +355,7 @@ void printHorizontel(char x,int size){
             }
 }
 
-void printNumInBox(int i,int q){
+void printNumInBox(int i,int q){  //print the number of the player who closed the box in it.
     if(choosen(lower)==1){
                     if(i%2!=0){
                         if(p1.color==1){
@@ -555,7 +558,7 @@ void printNumInBox(int i,int q){
                 }
 }
 
-void printVertical(char x,int size,int i){
+void printVertical(char x,int size,int i){  //prints vertical line in the grid.
     int q;
     for(int j=0;j<size+1;j++){
                 if(x>=97 && x<=126){
@@ -583,7 +586,7 @@ void printVertical(char x,int size,int i){
             }
 }
 
-void printGrid(char x,int size){
+void printGrid(char x,int size){  //control printing
     turn=turn%2;
     upper=65,lower=96-size;
     usedChars[index1]=x;
@@ -605,7 +608,7 @@ void printGrid(char x,int size){
     printf("\n");
 }
 
-void printscores(){
+void printscores(){  //prints the score of each player with his color.
     score1();
     score2();
     printf("Current Score:\n     ");
@@ -635,7 +638,77 @@ void printscores(){
     }
 }
 
-int winner(int ans,char name[],int len){
+
+void calculateMoves(){  //calculates the number of moves of each player.
+    int count1=0,count2=0;
+    for(int i=0;i<60;i++){
+        if(turns[i]==1){
+            count1++;
+        }
+        else if(turns[i]==2){
+            count2++;
+        }
+    }
+    NoMoves1=count1;
+    NoMoves2=count2;
+}
+
+void printmoves(){  //prints the number of moves of each player with his color.
+    if(p1.color==1){
+    cout<<BRED<<p1.name<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==2){
+    cout<<BBLU<<p1.name<<reset<<" Moved "<<BBLU<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==3){
+    cout<<BMAG<<p1.name<<reset<<" Moved "<<BMAG<<NoMoves1<<reset<<" moves.\n";
+    }
+    else if(p1.color==4){
+    cout<<BYEL<<p1.name<<reset<<" Moved "<<BYEL<<NoMoves1<<reset<<" moves.\n";
+    }
+    if(p2.color==1){
+    cout<<BRED<<p2.name<<reset<<" Moved "<<BRED<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==2){
+    cout<<BBLU<<p2.name<<reset<<" Moved "<<BBLU<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==3){
+    cout<<BMAG<<p2.name<<reset<<" Moved "<<BMAG<<NoMoves2<<reset<<" moves.\n\n";
+    }
+    else if(p2.color==4){
+    cout<<BYEL<<p2.name<<reset<<" Moved "<<BYEL<<NoMoves2<<reset<<" moves.\n\n";
+    }
+}
+
+void printremaininglines(int size){  //prints how many remaining lines in the grid.
+    int total=(size*(size+1))*2;
+    int counter=0;
+    for(int i=0;i<index1;i++){
+        if(usedChars[i]!=0){
+            counter++;
+        }
+    }
+    cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
+}
+
+void printtime(struct timespec begin,struct timespec end){  //printint time spent from the start of the game.
+    int sec=end.tv_sec-begin.tv_sec;
+    int min=0;
+    if(sec>59){
+        min=sec/60;
+        sec%=60;
+    }
+    cout<<"Time spent : ";
+    cout<<BGRN<<"0"<<min;
+    if(sec<10){
+        cout<<" : 0"<<sec<<reset<<"\n\n";
+    }
+    else{
+        cout<<" : "<<sec<<reset<<"\n\n";
+    }
+}
+
+int winner(int ans,char name[],int len){  //calculate winner's total score and rank and return them to print winner function.
     FILE *pF=fopen("winners.txt","r");
     vector <string> winners(0); 
     char buffer[255];
@@ -704,7 +777,7 @@ int winner(int ans,char name[],int len){
 
 }
 
-void printwinner(){
+void printwinner(){  //print winner's name ,his score in this game,his total score and his rank.
     score1();
     score2();
     if(p1.score>p2.score){
@@ -756,59 +829,7 @@ void printwinner(){
     }
 }
 
-void calculateMoves(){
-    int count1=0,count2=0;
-    for(int i=0;i<60;i++){
-        if(turns[i]==1){
-            count1++;
-        }
-        else if(turns[i]==2){
-            count2++;
-        }
-    }
-    NoMoves1=count1;
-    NoMoves2=count2;
-}
-
-void printmoves(){
-    if(p1.color==1){
-    cout<<BRED<<p1.name<<reset<<" Moved "<<BRED<<NoMoves1<<reset<<" moves.\n";
-    }
-    else if(p1.color==2){
-    cout<<BBLU<<p1.name<<reset<<" Moved "<<BBLU<<NoMoves1<<reset<<" moves.\n";
-    }
-    else if(p1.color==3){
-    cout<<BMAG<<p1.name<<reset<<" Moved "<<BMAG<<NoMoves1<<reset<<" moves.\n";
-    }
-    else if(p1.color==4){
-    cout<<BYEL<<p1.name<<reset<<" Moved "<<BYEL<<NoMoves1<<reset<<" moves.\n";
-    }
-    if(p2.color==1){
-    cout<<BRED<<p2.name<<reset<<" Moved "<<BRED<<NoMoves2<<reset<<" moves.\n\n";
-    }
-    else if(p2.color==2){
-    cout<<BBLU<<p2.name<<reset<<" Moved "<<BBLU<<NoMoves2<<reset<<" moves.\n\n";
-    }
-    else if(p2.color==3){
-    cout<<BMAG<<p2.name<<reset<<" Moved "<<BMAG<<NoMoves2<<reset<<" moves.\n\n";
-    }
-    else if(p2.color==4){
-    cout<<BYEL<<p2.name<<reset<<" Moved "<<BYEL<<NoMoves2<<reset<<" moves.\n\n";
-    }
-}
-
-void printremaininglines(int size){
-    int total=(size*(size+1))*2;
-    int counter=0;
-    for(int i=0;i<index1;i++){
-        if(usedChars[i]!=0){
-            counter++;
-        }
-    }
-    cout<<"Remaining lines "<<BGRN<<total-counter<<reset<<"\n\n";
-}
-
-void save(){
+void save(){  //save all game details to continue any time later
     printf("Enter Name\n");
     char savingfile2[255];
     char savingfile[255];
@@ -856,10 +877,10 @@ void save(){
     }
 }
 
-
-
+// Next three function are responsible for undo and redo
+int maxredo=0,moves=-1;
 void undo(int size);
-void redo(int size){
+void redo(int size){  
     turn++;
     printGrid(char(redoarr[moves+1]),size);
     index1++;
@@ -980,7 +1001,7 @@ void undo(int size){
 
 }
 
-void first(){
+void first(){  //define undoarr by zeros before the first move.
             for(int j=0;j<3;j++){
                 if(j==0){
                     for(int k=0;k<60;k++){
@@ -1001,9 +1022,9 @@ void first(){
             }
 }
 
-
+// Next 10 functions are responsible for DFS.
 char lastline2=' ';
-void whoIsLast2_1(char c,int size){
+void whoIsLast2_1(char c,int size){  //returns the missed line to dfs1.
         int def=32+((c%97)/(size+1));
         if(!choosen(c+1)){
             lastline2=c+1;
@@ -1016,7 +1037,7 @@ void whoIsLast2_1(char c,int size){
             }
 }
 
-void whoIsLast2_2(char c,int size){
+void whoIsLast2_2(char c,int size){  //returns the missed line to dfs2.
         int def=32+((c%97)/(size+1));
         if(!choosen(c-1)){
             lastline2=c-1;
@@ -1029,7 +1050,7 @@ void whoIsLast2_2(char c,int size){
             }
 }
 
-void whoIsLast2_3(char c,int size){
+void whoIsLast2_3(char c,int size){  //returns the missed line to dfs3.
     int def=32+(c%65)/size;
         if(!choosen(c+size)){
             lastline2=c+size;
@@ -1042,7 +1063,7 @@ void whoIsLast2_3(char c,int size){
             }
 }
 
-void whoIsLast2_4(char c,int size){
+void whoIsLast2_4(char c,int size){  //returns the missed line to dfs4.
     int def=32+(c%65)/size;
         if(!choosen(c-size)){
             lastline2=c-size;
@@ -1055,9 +1076,9 @@ void whoIsLast2_4(char c,int size){
             }
 }
 
-vector<char> dfss(0);
+vector<char> dfss(0); //stores the characters of dfs to print them in grid.
 
-void printDFS(int size){
+void printDFS(int size){ //prints the grid after choosing dfs characters for the player.
     int S=dfss.size();
     int flag=0;
     for(int i=0;i<S;i++){
@@ -1090,7 +1111,7 @@ void printDFS(int size){
     }
 }
 
-void emptydfss(){
+void emptydfss(){  //clear all elemnts in dfss array
     int S=dfss.size();
     for(int i=0;i<S;i++){
         dfss.pop_back();
@@ -1101,7 +1122,7 @@ void dfs2(char c,int size);
 void dfs3(char c,int size);
 void dfs4(char c,int size);
 
-void dfs1(char c,int size){
+void dfs1(char c,int size){  //check dfs for the box right the current box. 
     if(c==97+size ||c==97+(2*size)+1 || c==97+(3*size)+2 || c==97+(4*size)+3 || c==97+(5*size)+4){
         return;
     }
@@ -1153,7 +1174,7 @@ void dfs1(char c,int size){
 } 
 
 
-void dfs2(char c,int size){
+void dfs2(char c,int size){  //check dfs for the box left the current box. 
     if(c==97 ||c==97+(1*size)+1 || c==97+(2*size)+2 || c==97+(3*size)+3 || c==97+(4*size)+4){
         return;
     }
@@ -1204,8 +1225,7 @@ void dfs2(char c,int size){
     }
 } 
 
-
-void dfs3(char c,int size){
+void dfs3(char c,int size){  //check dfs for the box below the current box. 
     if(c==65+(size*size)  ||c==65+(size*size)+1  || c==65+(size*size)+2 || c==65+(size*size)+3 || c==65+(size*size)+4){
         return;
     }
@@ -1256,7 +1276,7 @@ void dfs3(char c,int size){
     }
 }
 
-void dfs4(char c,int size){
+void dfs4(char c,int size){  //check dfs for the box above the current box. 
     if(size==2){
         if(c==65 ||c==66){
             return;
@@ -1344,16 +1364,18 @@ void dfs4(char c,int size){
 } 
 
 
-
-int continueGame1(int size){
+int continueGame1(int size,struct timespec begin){  //continue a saved game when mode is 1.
     char x=0,ans;
     printGrid(x,size);
+    struct timespec end;
     while(index1!=(size*(size+1))*2){
+        timespec_get(&end,TIME_UTC);
         moves++;
         printscores();
         calculateMoves();
         printmoves();
         printremaininglines(size);
+        printtime(begin,end);
         printf("It's ");
         printPlayer();
         printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -1456,15 +1478,19 @@ int continueGame1(int size){
     return 1;
 }
 
-int continueGame2(int size){
+int continueGame2(int size,struct timespec begin){   //continue a saved game when mode is 2.
     char x=0;
+    printGrid(0,size);
+    struct timespec end;
     while(index1!=(size*(size+1))*2){
+        timespec_get(&end,TIME_UTC);
         if(turn==0){
             moves++;
             printscores();
             calculateMoves();
             printmoves();
             printremaininglines(size);
+            printtime(begin,end);
             printf("It's ");
             printPlayer();
             printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -1631,17 +1657,19 @@ int continueGame2(int size){
         return 1 ;
 }
 
-
-int mode1(int size){
+int mode1(int size,struct timespec begin){   //starts a new game when mode is 1.
     char x=0,ans;
     enterplayers1();
     printGrid(x,size);
+    struct timespec end;
     while(index1!=(size*(size+1))*2){
+        timespec_get(&end,TIME_UTC);
         moves++;
         printscores();
         calculateMoves();
         printmoves();
         printremaininglines(size);
+        printtime(begin,end);
         printf("It's ");
         printPlayer();
         printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -1744,17 +1772,20 @@ int mode1(int size){
         return 1 ;
 }
 
-int mode2(int size){
+int mode2(int size,struct timespec begin){  //starts a new game when mode is 2.
     char x=0;
     enterplayers2();
     printGrid(0,size);
+    struct timespec end;
     while(index1!=(size*(size+1))*2){
+        timespec_get(&end,TIME_UTC);
         if(turn==0){
             moves++;
             printscores();
             calculateMoves();
             printmoves();
             printremaininglines(size);
+            printtime(begin,end);
             printf("It's ");
             printPlayer();
             printf(" turn\nEnter the letter of the line you want to choose : \n");
@@ -1921,8 +1952,10 @@ int mode2(int size){
         return 1 ;
 }
 
-
-void newGame(){
+void menu();
+void newGame(){  //enter the detalils of the game to start it.
+    struct timespec begin,end2;
+    timespec_get(&begin,TIME_UTC);
     int x;
     for(int i=0;i<60;i++){
         usedChars[i]=' ';
@@ -1936,23 +1969,22 @@ void newGame(){
     int mode=choosemode();
     first();
     if(mode==1){
-    x = mode1(size);
+        x = mode1(size,begin);
     }
     else{
-    x = mode2(size);
+    x = mode2(size,begin);
     }
     if ( x==1){
-    printscores();
-    calculateMoves();
-    printmoves();
-    printremaininglines(size);
-    printwinner();
-}
+        printscores();
+        calculateMoves();
+        printmoves();
+        printremaininglines(size);
+        printtime(begin,end2);
+        printwinner();
+    }
 }
 
-void menu();
-
-void load(){
+void load(){  //load a saved game by entering its name. 
     char nlines;
     FILE *sg=fopen("savedGames.txt","r");
     vector <string> Games(0); 
@@ -2048,17 +2080,20 @@ void load(){
     // turn=(turn+1)%2;
     first();
     int x;
+    struct timespec begin,end2;
+    timespec_get(&begin,TIME_UTC);
     if(mod2==1){
-    x= continueGame1(size2);
+    x= continueGame1(size2,begin);
     }
     else{
-    x=continueGame2(size2);
+    x=continueGame2(size2,begin);
     }
     if (x==1){
     printscores();
     calculateMoves();
     printmoves();
     printremaininglines(size2);
+    printtime(begin,end2);
     printwinner();
     // remove(loadedFile);
     // return 0;
@@ -2066,7 +2101,7 @@ void load(){
     }
 }
 
-void topTen(){
+void topTen(){ //calculate top 10 and print them.
     FILE *pF=fopen("winners.txt","r");
     vector <string> winners(0); 
     char buffer[255];
@@ -2129,14 +2164,14 @@ void topTen(){
     }
 }
 
-void userManual(){
+void userManual(){  //print user manual
     printf("Welcome to Dots&Boxes game\n\n");
     printf("-The game consists of a grid of some boxes devided into lines.\n-Each player in his turn select one line\n");
     printf("-The target is to close a box\n-The player who close a box his score increases by one and he have another turn\n");
     printf("-The game ends when all lines are selected\n");
 }
 
-void menu(){
+void menu(){  //print menu
     char ans;
     int ans2=0;
     while(ans2==0){
@@ -2173,3 +2208,4 @@ int main(){
     printf("== Welcome to Dots&Boxes game ==\n");
     menu();
 }
+// ===========================Finish the Game========================
